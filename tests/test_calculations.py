@@ -79,3 +79,96 @@ def test_absolute_difference():
     calc = Calculator()
     result = calc.absolute_difference(operation="Absolute Difference", operands=[Decimal('5.0'), Decimal('3.0')])
     assert result == Decimal('2.0')
+
+def test_unknown_operation():
+    calc = Calculator()
+    with pytest.raises(OperationError, match="Unknown operation: Unknown"):
+        calc.add(operation="Unknown", operands=[Decimal('1.0'), Decimal('2.0')])
+
+def test_to_dict():
+    calc = Calculator()
+    result = calc.to_dict(operation="Addition", operands=[Decimal('2.5'), Decimal('3.5')], result=Decimal('6.0'))
+    assert result == {
+        "operation": "Addition",
+        "operands": [Decimal('2.5'), Decimal('3.5')],
+        "result": Decimal('6.0'),
+        "timestamp": result["timestamp"]  # We can't assert the exact timestamp, but we can check its presence
+    }
+
+def test_from_dict():
+    calc = Calculator()
+    data = {
+        "operation": "Addition",
+        "operands": [Decimal('2.5'), Decimal('3.5')],
+        "result": Decimal('6.0'),
+        "timestamp": datetime.now().isoformat()
+    }
+    calc = Calculation.from_dict(data)
+    assert calc.operation == "Addition"
+    assert calc.operands == [Decimal('2.5'), Decimal('3.5')]
+    assert calc.result == Decimal('6.0')
+
+def test_invalid_from_dict():
+    data = {
+        "operation": "Addition",
+        "operands": [Decimal('2.5'), Decimal('3.5')],
+        # Missing 'result' and 'timestamp'
+    }
+    with pytest.raises(OperationError):
+        Calculation.from_dict(data)
+
+def test_invalid_from_dict():
+    data = {
+        "operation": "Addition",
+        "operands": [Decimal('2.5'), Decimal('3.5')],
+        # Missing 'result' and 'timestamp'
+    }
+    with pytest.raises(OperationError, match="Invalid data for Calculation.from_dict: missing required fields."):
+        Calculation.from_dict(data)
+
+def test_format_result():
+    calc = Calculator()
+    result = calc.format_result(Decimal('6.0'))
+    assert result == '6.0'
+
+def test_equality():
+    calc1 = Calculator()
+    calc2 = Calculator()
+    calc3 = Calculator()
+    result1 = calc1.add(operation="Addition", operands=[Decimal('2.5'), Decimal('3.5')])
+    result2 = calc2.add(operation="Addition", operands=[Decimal('2.5'), Decimal('3.5')])
+    result3 = calc1.add(operation="Subtraction", operands=[Decimal('2.5'), Decimal('4.5')])
+    assert result1 == result2
+    assert result1 != result3
+
+def test_logging(caplog):
+    calc = Calculator()
+    with caplog.at_level(logging.INFO):
+        calc.add(operation="Addition", operands=[Decimal('2.5'), Decimal('3.5')])
+    assert "Performed Addition on operands [Decimal('2.5'), Decimal('3.5')] with result Decimal('6.0')" in caplog.text
+
+# Logging test for error handling
+def test_logging_error(caplog):
+    calc = Calculator()
+    with caplog.at_level(logging.ERROR):
+        with pytest.raises(OperationError):
+            calc.divide(operation="Division", operands=[Decimal('6.0'), Decimal('0.0')])
+    assert "Error during Division: Cannot divide by zero." in caplog.text
+
+# Logging warning record test
+def test_logging_warning(caplog):
+    """
+    Test that a warning is logged when a saved calculation 
+    from the dictionary does not match the expected result.
+    """
+    # Arrange
+    data = {
+        "operation": "Addition",
+        "operands": [Decimal('2.5'), Decimal('3.5')],
+        "result": Decimal('5.0'),  # Intentionally incorrect result
+        "timestamp": datetime.now().isoformat()
+    }
+
+    # Act
+    with caplog.at_level(logging.WARNING):
+        calc = Calculation.from_dict(data)
