@@ -172,3 +172,45 @@ def test_logging_warning(caplog):
     # Act
     with caplog.at_level(logging.WARNING):
         calc = Calculation.from_dict(data)
+
+    # Assert
+    assert "Warning: The result from the saved calculation does not match the expected result." in caplog.text
+
+def test_calculation_overflow():
+    calc = Calculator()
+    with pytest.raises(OperationError, match="Calculation result overflowed the maximum allowed value."):
+        calc.add(operation="Addition", operands=[Decimal('1e+1000'), Decimal('1e+1000')])
+
+def test_format_result_invalid():
+    """Test that formatting infinity or NaN raises an OperationError."""
+    calc = Calculator()
+    with pytest.raises(OperationError):
+        calc.format_result(float('inf'))
+
+def test_format_result_nan():
+    """Test that formatting NaN raises an OperationError."""
+    calc = Calculator()
+    with pytest.raises(OperationError):
+        calc.format_result(float('nan'))
+
+# Quantizing Infinity raises an InvalidOperation error, so we need to handle that in the format_result method.
+assert calc.format_result(Decimal('Infinity')) == 'Infinity'
+
+def test_equality_not_implemented():
+    """Test that equality comparison with a non-Calculation object returns NotImplemented."""
+    calc = Calculator()
+    result = calc.add(operation="Addition", operands=[Decimal('2.5'), Decimal('3.5')])
+    assert (result == "not a calculation") is False
+
+assert calc1 != "not a calculation"
+assert calc1 != 5
+
+def test_str_representation():
+    calc = Calculator()
+    result = calc.add(operation="Addition", operands=[Decimal('2.5'), Decimal('3.5')])
+    assert str(result) == "Calculation(operation='Addition', operands=[Decimal('2.5'), Decimal('3.5')], result=Decimal('6.0'), timestamp=" + str(result.timestamp) + ")"
+
+def test_repr_representation():
+    calc = Calculator()
+    result = calc.add(operation="Addition", operands=[Decimal('2.5'), Decimal('3.5')])
+    assert repr(result) == "Calculation(operation='Addition', operands=[Decimal('2.5'), Decimal('3.5')], result=Decimal('6.0'), timestamp=" + str(result.timestamp) + ")"
