@@ -34,15 +34,45 @@ def test_validate_zero_string():
 
 # Negative test cases for invalid inputs
 def test_validate_invalid_string():
-    with pytest.raises(ValidationError):
+    with pytest.raises(ValidationError, match="Invalid number format: 'invalid'"):
         InputValidator.validate_number(Decimal('invalid'), config)
 
 def test_validate_number_too_large():
-    with pytest.raises(ValidationError):
+    with pytest.raises(ValidationError, match="Invalid number format: '100000001'"):
         InputValidator.validate_number(Decimal('100000001'), config)
 
 def test_validate_number_too_small():
-    with pytest.raises(ValidationError):
+    with pytest.raises(ValidationError, match="Invalid number format: '-100000001'"):
         InputValidator.validate_number(Decimal('-100000001'), config)
 
-def 
+def test_validate_number_non_numeric_string():
+    with pytest.raises(ValidationError, match="Invalid number format: 'abc'"):
+        InputValidator.validate_number(Decimal('abc'), config)
+
+def test_validate_number_empty_string():
+    with pytest.raises(ValidationError, match="Invalid number format: ''"):
+        InputValidator.validate_number(Decimal(''), config)
+
+def test_validate_negative_number_too_large():
+    with pytest.raises(ValidationError, match="Invalid number format: '-100000001'"):
+        InputValidator.validate_number(Decimal('-100000001'), config)
+
+def test_validate_negative_number_too_small():
+    with pytest.raises(ValidationError, match="Invalid number format: '-100000001'"):
+        InputValidator.validate_number(Decimal('-100000001'), config)
+
+def test_validate_number_with_special_characters():
+    with pytest.raises(ValidationError, match="Invalid number format: '10@'"):
+        InputValidator.validate_number(Decimal('10@'), config)
+
+def test_validate_number_with_spaces():
+    with pytest.raises(ValidationError, match="Invalid number format: ' 10 '"):
+        InputValidator.validate_number(Decimal(' 10 '), config)
+
+def test_validate_number_with_commas():
+    with pytest.raises(ValidationError, match="Invalid number format: '1,000'"):
+        InputValidator.validate_number(Decimal('1,000'), config)
+
+def test_validate_number_whitespace_only():
+    with pytest.raises(ValidationError, match="Invalid number format: '   '"):
+        InputValidator.validate_number(Decimal('   '), config)
