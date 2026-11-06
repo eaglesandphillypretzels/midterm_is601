@@ -6,6 +6,8 @@ from app.input_validators import InputValidator
 
 config = CalculatorConfig(max_input_value=Decimal('100000000'))
 
+# Positive test cases for valid inputs
+
 def test_validate_number_positive_integer():
     assert InputValidator.validate_number(Decimal('10'), config) == Decimal('10')
 

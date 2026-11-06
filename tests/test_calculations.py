@@ -114,15 +114,6 @@ def test_invalid_from_dict():
         "operands": [Decimal('2.5'), Decimal('3.5')],
         # Missing 'result' and 'timestamp'
     }
-    with pytest.raises(OperationError):
-        Calculation.from_dict(data)
-
-def test_invalid_from_dict():
-    data = {
-        "operation": "Addition",
-        "operands": [Decimal('2.5'), Decimal('3.5')],
-        # Missing 'result' and 'timestamp'
-    }
     with pytest.raises(OperationError, match="Invalid data for Calculation.from_dict: missing required fields."):
         Calculation.from_dict(data)
 
