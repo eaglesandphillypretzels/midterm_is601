@@ -205,3 +205,5 @@ def test_repr_representation():
     calc = Calculator()
     result = calc.add(operation="Addition", operands=[Decimal('2.5'), Decimal('3.5')])
     assert repr(result) == "Calculation(operation='Addition', operands=[Decimal('2.5'), Decimal('3.5')], result=Decimal('6.0'), timestamp=" + str(result.timestamp) + ")"
+
+assert result_repr() == result
