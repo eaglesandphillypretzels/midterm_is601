@@ -32,7 +32,8 @@ def test_validate_negative_string():
 def test_validate_zero_string():
     assert InputValidator.validate_number(Decimal('0'), config) == Decimal('0')
 
-# Negative test cases for invalid inputs
+# Negative test cases for invalid inputs/edge cases
+
 def test_validate_invalid_string():
     with pytest.raises(ValidationError, match="Invalid number format: 'invalid'"):
         InputValidator.validate_number(Decimal('invalid'), config)
