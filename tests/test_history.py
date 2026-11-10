@@ -45,4 +45,12 @@ def test_autosave_observer_logs_autosave(Logging_info_mock):
     observer = AutoSaveObserver(calculator_mock)
 
     observer.update(calculation_mock)
-    logging_info_mock.assert_called_once_with("History auto-saved") 
+    logging_info_mock.assert_called_once_with("History auto-saved")
+
+def test_autosave_observer_does_not_trigger_save_when_disabled():
+    calculator_mock = Mock(spec=Calculator)
+    calculator_mock.config = Mock(spec=CalculatorConfig)
+    calculator_mock.config.auto_save = False
+    observer = AutoSaveObserver(calculator_mock)
+    observer.update(calculation_mock)
+    calculator_mock.save_history.assert_not_called()
