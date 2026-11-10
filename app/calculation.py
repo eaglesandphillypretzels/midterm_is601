@@ -30,7 +30,7 @@ class Calculation:
     def _raise_neg_power(self):
         raise OperationError("Negative exponent is not allowed for this operation")
 
-    def _raise_invalid_root(self, x: Decimal, y: Decimal):
+    def _raise_invalid_root(self):
         raise OperationError("Invalid root operation")
 
     def _raise_invalid_modulus(self):
@@ -46,7 +46,7 @@ class Calculation:
             "Root": lambda x, y: (
                 Decimal(pow(float(x), 1 / float(y)))
                 if x >= 0 and y != 0
-                else self._raise_invalid_root(x, y)
+                else self._raise_invalid_root()
             ),
             "Modulus": lambda x, y: x % y if y >= 0 else self._raise_invalid_modulus(),
             "Percent": lambda x, y: (x / y) * 100,
