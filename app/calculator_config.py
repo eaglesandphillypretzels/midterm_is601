@@ -33,7 +33,7 @@ class CalculatorConfig:
 
         # Max history size
         self.max_history_size = max_history_size or int(
-            os.getenv ('CALCULATOR_MAX_HISTORY_SIZE', '2000')
+            os.getenv ('CALCULATOR_MAX_HISTORY_SIZE', '500')
         )
 
         
