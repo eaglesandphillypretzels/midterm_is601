@@ -45,4 +45,4 @@ def test_autosave_observer_logs_autosave(Logging_info_mock):
     observer = AutoSaveObserver(calculator_mock)
 
     observer.update(calculation_mock)
-    logging_info_mock.assert_called_once_with("History auto-saved")
+    logging_info_mock.assert_called_once_with("History auto-saved") 
