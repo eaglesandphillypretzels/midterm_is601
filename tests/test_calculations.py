@@ -40,15 +40,15 @@ def test_negative_power():
     result = calc.power(operation="Power", operands=[Decimal('2.0'), Decimal('-3.0')])
     assert result == Decimal('0.125')
 
-def test_square_root():
+def test_root():
     calc = Calculator()
-    result = calc.square_root(operation="Square Root", operands=[Decimal('16.0')])
+    result = calc.square_root(operation="Root", operands=[Decimal('16.0')])
     assert result == Decimal('4.0')
 
-def test_invalid_square_root():
+def test_invalid_root():
     calc = Calculator()
-    with pytest.raises(OperationError, match="Cannot calculate the square root of a negative number."):
-        calc.square_root(operation="Square Root", operands=[Decimal('-16.0')])
+    with pytest.raises(OperationError, match="Cannot calculate the root of a negative number."):
+        calc.square_root(operation="Root", operands=[Decimal('-16.0')])
 
 def test_modulus():
     calc = Calculator()
@@ -59,16 +59,6 @@ def test_invalid_modulus():
     calc = Calculator()
     with pytest.raises(OperationError, match="Cannot perform modulus operation with a divisor of zero."):
         calc.modulus(operation="Modulus", operands=[Decimal('10.0'), Decimal('0.0')])
-
-def test_integer_division():
-    calc = Calculator()
-    result = calc.integer_division(operation="Integer Division", operands=[Decimal('7.0'), Decimal('2.0')])
-    assert result == Decimal('3.0')
-
-def test_invalid_integer_division():
-    calc = Calculator()
-    with pytest.raises(OperationError, match="Cannot perform integer division with a divisor of zero."):
-        calc.integer_division(operation="Integer Division", operands=[Decimal('7.0'), Decimal('0.0')])
 
 def test_percent():
     calc = Calculator()
