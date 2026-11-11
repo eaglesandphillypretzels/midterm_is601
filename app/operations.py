@@ -64,6 +64,8 @@ class Division(Operation):
 class Power(Operation):
     def validate_operands(self, a: Decimal, b: Decimal) -> None:
         super().validate_operands(a, b)
+        if b < 0:
+            raise ValidationError("Negative exponents are not supported")
 
     def execute(self, a: Decimal, b: Decimal) -> Decimal:
         """Raise a number to the power of another number."""
@@ -127,3 +129,40 @@ class UnknownOperation(Operation):
         """Raise a validation error for unsupported operations."""
         self.validate_operands(a, b)
         raise ValidationError("Unknown operation")
+
+
+class OperationFactory:
+    """Create operation instances by the names used in the calculator."""
+
+    _operations = {
+        "Addition": Addition,
+        "Subtraction": Subtraction,
+        "Multiplication": Multiplication,
+        "Division": Division,
+        "Power": Power,
+        "Root": Root,
+        "Modulus": Modulus,
+        "Percent": Percent,
+        "Absolute Difference": AbsoluteDifference,
+        "AbsoluteDifference": AbsoluteDifference,
+        "absolute difference": AbsoluteDifference,
+        "Unknown": UnknownOperation,
+        "UnknownOperation": UnknownOperation,
+    }
+
+    @classmethod
+    def create(cls, name: str) -> Operation:
+        normalized_name = str(name).strip()
+        operation_class = cls._operations.get(normalized_name)
+        if operation_class is None:
+            operation_class = cls._operations.get(normalized_name.lower())
+        if operation_class is None:
+            title_case_name = normalized_name.title()
+            operation_class = cls._operations.get(title_case_name)
+        if operation_class is None:
+            raise ValidationError(f"Unknown operation: {name}")
+        return operation_class()
+
+    @classmethod
+    def get_available_operations(cls) -> Dict[str, type[Operation]]:
+        return dict(cls._operations)

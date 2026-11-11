@@ -2,78 +2,72 @@ import pytest
 from decimal import Decimal
 from app.calculator_config import CalculatorConfig
 from app.exceptions import ValidationError
-from app.input_validators import InputValidator
+from app.input_validators import InputValidator  # adjust as per your file structure
 
-config = CalculatorConfig(max_input_value=Decimal('100000000'))
+# Sample configuration with a max input value of 1 million for testing purposes
+config = CalculatorConfig(max_input_value=Decimal('1000000'))
 
-# Positive test cases for valid inputs
+# Test cases for InputValidator.validate_number
 
 def test_validate_number_positive_integer():
-    assert InputValidator.validate_number(Decimal('10'), config) == Decimal('10')
-
-def test_validate_number_negative_integer():
-    assert InputValidator.validate_number(Decimal('-10'), config) == Decimal('-10')
-
-def test_validate_number_zero():
-    assert InputValidator.validate_number(Decimal('0'), config) == Decimal('0')
+    assert InputValidator.validate_number(123, config) == Decimal('123')
 
 def test_validate_number_positive_decimal():
-    assert InputValidator.validate_number(Decimal('10.5'), config) == Decimal('10.5')
+    assert InputValidator.validate_number(123.456, config) == Decimal('123.456').normalize()
+
+def test_validate_number_positive_string_integer():
+    assert InputValidator.validate_number("123", config) == Decimal('123')
+
+def test_validate_number_positive_string_decimal():
+    assert InputValidator.validate_number("123.456", config) == Decimal('123.456').normalize()
+
+def test_validate_number_negative_integer():
+    assert InputValidator.validate_number(-789, config) == Decimal('-789')
 
 def test_validate_number_negative_decimal():
-    assert InputValidator.validate_number(Decimal('-10.5'), config) == Decimal('-10.5')
+    assert InputValidator.validate_number(-789.123, config) == Decimal('-789.123').normalize()
 
-def test_validate_positive_string():
-    assert InputValidator.validate_number(Decimal('10'), config) == Decimal('10')
+def test_validate_number_negative_string_integer():
+    assert InputValidator.validate_number("-789", config) == Decimal('-789')
 
-def test_validate_negative_string():
-    assert InputValidator.validate_number(Decimal('-10'), config) == Decimal('-10')
+def test_validate_number_negative_string_decimal():
+    assert InputValidator.validate_number("-789.123", config) == Decimal('-789.123').normalize()
 
-def test_validate_zero_string():
-    assert InputValidator.validate_number(Decimal('0'), config) == Decimal('0')
+def test_validate_number_zero():
+    assert InputValidator.validate_number(0, config) == Decimal('0')
 
-# Negative test cases for invalid inputs/edge cases
+def test_validate_number_trimmed_string():
+    assert InputValidator.validate_number("  456  ", config) == Decimal('456')
 
-def test_validate_invalid_string():
-    with pytest.raises(ValidationError, match="Invalid number format: 'invalid'"):
-        InputValidator.validate_number(Decimal('invalid'), config)
+# Negative test cases
+def test_validate_number_invalid_string():
+    with pytest.raises(ValidationError, match="Invalid number format: abc"):
+        InputValidator.validate_number("abc", config)
 
-def test_validate_number_too_large():
-    with pytest.raises(ValidationError, match="Invalid number format: '100000001'"):
-        InputValidator.validate_number(Decimal('100000001'), config)
+def test_validate_number_exceeds_max_value():
+    with pytest.raises(ValidationError, match="Value exceeds maximum allowed"):
+        InputValidator.validate_number(Decimal('1000001'), config)
 
-def test_validate_number_too_small():
-    with pytest.raises(ValidationError, match="Invalid number format: '-100000001'"):
-        InputValidator.validate_number(Decimal('-100000001'), config)
+def test_validate_number_exceeds_max_value_string():
+    with pytest.raises(ValidationError, match="Value exceeds maximum allowed"):
+        InputValidator.validate_number("1000001", config)
 
-def test_validate_number_non_numeric_string():
-    with pytest.raises(ValidationError, match="Invalid number format: 'abc'"):
-        InputValidator.validate_number(Decimal('abc'), config)
+def test_validate_number_exceeds_negative_max_value():
+    with pytest.raises(ValidationError, match="Value exceeds maximum allowed"):
+        InputValidator.validate_number(-Decimal('1000001'), config)
 
 def test_validate_number_empty_string():
-    with pytest.raises(ValidationError, match="Invalid number format: ''"):
-        InputValidator.validate_number(Decimal(''), config)
+    with pytest.raises(ValidationError, match="Invalid number format: "):
+        InputValidator.validate_number("", config)
 
-def test_validate_negative_number_too_large():
-    with pytest.raises(ValidationError, match="Invalid number format: '-100000001'"):
-        InputValidator.validate_number(Decimal('-100000001'), config)
+def test_validate_number_whitespace_string():
+    with pytest.raises(ValidationError, match="Invalid number format: "):
+        InputValidator.validate_number("   ", config)
 
-def test_validate_negative_number_too_small():
-    with pytest.raises(ValidationError, match="Invalid number format: '-100000001'"):
-        InputValidator.validate_number(Decimal('-100000001'), config)
+def test_validate_number_none_value():
+    with pytest.raises(ValidationError, match="Invalid number format: None"):
+        InputValidator.validate_number(None, config)
 
-def test_validate_number_with_special_characters():
-    with pytest.raises(ValidationError, match="Invalid number format: '10@'"):
-        InputValidator.validate_number(Decimal('10@'), config)
-
-def test_validate_number_with_spaces():
-    with pytest.raises(ValidationError, match="Invalid number format: ' 10 '"):
-        InputValidator.validate_number(Decimal(' 10 '), config)
-
-def test_validate_number_with_commas():
-    with pytest.raises(ValidationError, match="Invalid number format: '1,000'"):
-        InputValidator.validate_number(Decimal('1,000'), config)
-
-def test_validate_number_whitespace_only():
-    with pytest.raises(ValidationError, match="Invalid number format: '   '"):
-        InputValidator.validate_number(Decimal('   '), config)
+def test_validate_number_non_numeric_type():
+    with pytest.raises(ValidationError, match="Invalid number format: "):
+        InputValidator.validate_number([], config)
