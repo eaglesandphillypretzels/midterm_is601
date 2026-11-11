@@ -74,3 +74,62 @@ class TestAddition(BaseOperationTest):
         },
     }
     invalid_test_cases = {}  # Addition has no invalid cases
+
+class TestSubtraction(BaseOperationTest):
+    """Test Subtraction operation."""
+
+    operation_class = Subtraction
+    valid_test_cases = {
+        "positive_numbers": {"a": "5", "b": "3", "expected": "2"},
+        "negative_numbers": {"a": "-5", "b": "-3", "expected": "-2"},
+        "mixed_signs": {"a": "-5", "b": "3", "expected": "-8"},
+        "zero_result": {"a": "5", "b": "5", "expected": "0"},
+        "decimals": {"a": "5.5", "b": "3.3", "expected": "2.2"},
+        "large_numbers": {
+            "a": "1e10",
+            "b": "1e9",
+            "expected": "9000000000"
+        },
+    }
+    invalid_test_cases = {}  # Subtraction has no invalid cases
+
+
+class TestMultiplication(BaseOperationTest):
+    """Test Multiplication operation."""
+
+    operation_class = Multiplication
+    valid_test_cases = {
+        "positive_numbers": {"a": "5", "b": "3", "expected": "15"},
+        "negative_numbers": {"a": "-5", "b": "-3", "expected": "15"},
+        "mixed_signs": {"a": "-5", "b": "3", "expected": "-15"},
+        "multiply_by_zero": {"a": "5", "b": "0", "expected": "0"},
+        "decimals": {"a": "5.5", "b": "3.3", "expected": "18.15"},
+        "large_numbers": {
+            "a": "1e5",
+            "b": "1e5",
+            "expected": "10000000000"
+        },
+    }
+    invalid_test_cases = {}  # Multiplication has no invalid cases
+
+
+class TestDivision(BaseOperationTest):
+    """Test Division operation."""
+
+    operation_class = Division
+    valid_test_cases = {
+        "positive_numbers": {"a": "6", "b": "2", "expected": "3"},
+        "negative_numbers": {"a": "-6", "b": "-2", "expected": "3"},
+        "mixed_signs": {"a": "-6", "b": "2", "expected": "-3"},
+        "decimals": {"a": "5.5", "b": "2", "expected": "2.75"},
+        "divide_zero": {"a": "0", "b": "5", "expected": "0"},
+    }
+    invalid_test_cases = {
+        "divide_by_zero": {
+            "a": "5",
+            "b": "0",
+            "error": ValidationError,
+            "message": "Division by zero is not allowed"
+        },
+    }
+
