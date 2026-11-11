@@ -83,4 +83,47 @@ class Root(Operation):
         self.validate_operands(a, b)
         return Decimal(pow(float(a), 1 / float(b)))
 
-    
+class Modulus(Operation):
+    def validate_operands(self, a: Decimal, b: Decimal) -> None:
+        super().validate_operands(a, b)
+        if b == 0:
+            raise ValidationError("Cannot perform modulus operation with a divisor of zero.")
+        if b < 0:
+            raise ValidationError("Cannot perform modulus operation with a negative divisor.")
+
+    def execute(self, a: Decimal, b: Decimal) -> Decimal:
+        """Return the remainder after dividing one number by another."""
+        self.validate_operands(a, b)
+        return a % b
+
+
+class Percent(Operation):
+    def validate_operands(self, a: Decimal, b: Decimal) -> None:
+        super().validate_operands(a, b)
+        if b == 0:
+            raise ValidationError("Percent calculation cannot divide by zero.")
+
+    def execute(self, a: Decimal, b: Decimal) -> Decimal:
+        """Return the percentage of one number relative to another."""
+        self.validate_operands(a, b)
+        return (a / b) * Decimal("100")
+
+
+class AbsoluteDifference(Operation):
+    def validate_operands(self, a: Decimal, b: Decimal) -> None:
+        super().validate_operands(a, b)
+
+    def execute(self, a: Decimal, b: Decimal) -> Decimal:
+        """Return the absolute value of the difference between two numbers."""
+        self.validate_operands(a, b)
+        return abs(a - b)
+
+
+class UnknownOperation(Operation):
+    def validate_operands(self, a: Decimal, b: Decimal) -> None:
+        raise ValidationError("Unknown operation")
+
+    def execute(self, a: Decimal, b: Decimal) -> Decimal:
+        """Raise a validation error for unsupported operations."""
+        self.validate_operands(a, b)
+        raise ValidationError("Unknown operation")

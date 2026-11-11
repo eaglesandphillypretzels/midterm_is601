@@ -23,15 +23,15 @@ def clear_env_vars(*args):
 
 def test_default_configuration():
     config = CalculatorConfig()
-    assert config.max_history_size == 500
-    assert config.auto_save is False
-    assert config.precision == 8
-    assert config.max_input_value == Decimal("1000")
-    assert config.default_encoding == 'utf-16'
-    assert config.log_dir == Path('./test_logs').resolve()
-    assert config.history_dir == Path('./test_history').resolve()
-    assert config.history_file == Path('./test_history/test_history.csv').resolve()
-    assert config.log_file == Path('./test_logs/test_log.log').resolve()
+    assert getattr(config, 'max_history_size') == 500
+    assert getattr(config, 'auto_save') is False
+    assert getattr(config, 'precision') == 8
+    assert getattr(config, 'max_input_value') == Decimal("1000")
+    assert getattr(config, 'default_encoding') == 'utf-16'
+    assert getattr(config, 'log_dir') == Path('./test_logs').resolve()
+    assert getattr(config, 'history_dir') == Path('./test_history').resolve()
+    assert getattr(config, 'history_file') == Path('./test_history/test_history.csv').resolve()
+    assert getattr(config, 'log_file') == Path('./test_logs/test_log.log').resolve()
 
 def test_custom_configuration():
     config = CalculatorConfig(
@@ -41,14 +41,19 @@ def test_custom_configuration():
         max_input_value=Decimal("500"),
         default_encoding="ascii"
     )
-    assert config.max_history_size == 300
-    assert config.auto_save is True
-    assert config.precision == 5
-    assert config.max_input_value == Decimal("500")
-    assert config.default_encoding == "ascii"
+    assert getattr(config, 'max_history_size') == 300
+    assert getattr(config, 'auto_save') is True
+    assert getattr(config, 'precision') == 5
+    assert getattr(config, 'max_input_value') == Decimal("500")
+    assert getattr(config, 'default_encoding') == "ascii"
 
 def test_directory_properties():
-    clear_env_vars('CALCULATOR_LOG_DIR', 'CALCULATOR_HISTORY_DIR')
+    clear_env_vars(
+        'CALCULATOR_LOG_DIR',
+        'CALCULATOR_HISTORY_DIR',
+        'CALCULATOR_LOG_FILE',
+        'CALCULATOR_HISTORY_FILE',
+    )
     config = CalculatorConfig(base_dir=Path('/custom_base_dir'))
     assert config.log_dir == Path('/custom_base_dir/logs').resolve()
     assert config.history_dir == Path('/custom_base_dir/history').resolve()
