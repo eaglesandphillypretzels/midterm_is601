@@ -70,3 +70,19 @@ class Calculator:
             observer.update(calculation)
 
     def set_operation(self, operation: Operation) -> None:
+        self.operation_strategy = operation
+        logging.info(f"Set operation: {operation}")
+
+    def perform_operation(
+        self,
+        a: Union[str, Number],
+        b: Union[str, Number]
+    ) -> CalculationResult:
+        
+        if not self.operation_strategy:
+            raise OperationError("No operation set")
+
+        try:
+            # Validate and convert inputs to Decimal
+            validated_a = InputValidator.validate_number(a, self.config)
+            validated_b = InputValidator.validate_number(b, self.config)
