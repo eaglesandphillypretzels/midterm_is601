@@ -36,4 +36,37 @@ class CalculatorConfig:
             os.getenv ('CALCULATOR_MAX_HISTORY_SIZE', '500')
         )
 
-        
+    # Auto-save preference
+        auto_save_env = os.getenv('CALCULATOR_AUTO_SAVE', 'true').lower()
+        self.auto_save = auto_save if auto_save is not None else (
+            auto_save_env == 'true' or auto_save_env == '1'
+        )
+
+        # Calculation precision
+        self.precision = precision or int(
+            os.getenv('CALCULATOR_PRECISION', '10')
+        )
+
+        # Maximum input value allowed
+        self.max_input_value = max_input_value or Decimal(
+            os.getenv('CALCULATOR_MAX_INPUT_VALUE', '1e999')
+        )
+
+        # Default encoding for file operations
+        self.default_encoding = default_encoding or os.getenv(
+            'CALCULATOR_DEFAULT_ENCODING', 'utf-8'
+        )
+
+    @property
+    def log_dir(self) -> Path:
+        return Path(os.getenv(
+            'CALCULATOR_LOG_DIR',
+            str(self.base_dir / "logs")
+        )).resolve()
+
+    @property
+    def history_dir(self) -> Path:
+        return Path(os.getenv(
+            'CALCULATOR_HISTORY_DIR',
+            str(self.base_dir / "history")
+        )).resolve()
