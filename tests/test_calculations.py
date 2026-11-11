@@ -1,152 +1,131 @@
 import pytest
 from decimal import Decimal
 from datetime import datetime
-from app.calculation import Calculator
+from app.calculation import Calculation
 from app.exceptions import OperationError
 import logging
 
+
 def test_addition():
-    calc = Calculator()
-    result = calc.add(operation="Addition", operands=[Decimal('2.5'), Decimal('3.5')])
-    assert result == Decimal('6.0')
+    calc = Calculation(operation="Addition", operand1=Decimal("2"), operand2=Decimal("3"))
+    assert calc.result == Decimal("5")
+
 
 def test_subtraction():
-    calc = Calculator()
-    result = calc.subtract(operation="Subtraction", operands=[Decimal('5.0'), Decimal('2.0')])
-    assert result == Decimal('3.0')
+    calc = Calculation(operation="Subtraction", operand1=Decimal("5"), operand2=Decimal("3"))
+    assert calc.result == Decimal("2")
+
 
 def test_multiplication():
-    calc = Calculator()
-    result = calc.multiply(operation="Multiplication", operands=[Decimal('2.0'), Decimal('3.0')])
-    assert result == Decimal('6.0')
+    calc = Calculation(operation="Multiplication", operand1=Decimal("4"), operand2=Decimal("2"))
+    assert calc.result == Decimal("8")
+
 
 def test_division():
-    calc = Calculator()
-    result = calc.divide(operation="Division", operands=[Decimal('6.0'), Decimal('2.0')])
-    assert result == Decimal('3.0')
+    calc = Calculation(operation="Division", operand1=Decimal("8"), operand2=Decimal("2"))
+    assert calc.result == Decimal("4")
+
 
 def test_division_by_zero():
-    calc = Calculator()
-    with pytest.raises(OperationError):
-        calc.divide(operation="Division", operands=[Decimal('6.0'), Decimal('0.0')])
+    with pytest.raises(OperationError, match="Division by zero is not allowed"):
+        Calculation(operation="Division", operand1=Decimal("8"), operand2=Decimal("0"))
+
 
 def test_power():
-    calc = Calculator()
-    result = calc.power(operation="Power", operands=[Decimal('2.0'), Decimal('3.0')])
-    assert result == Decimal('8.0')
+    calc = Calculation(operation="Power", operand1=Decimal("2"), operand2=Decimal("3"))
+    assert calc.result == Decimal("8")
+
 
 def test_negative_power():
-    calc = Calculator()
-    result = calc.power(operation="Power", operands=[Decimal('2.0'), Decimal('-3.0')])
-    assert result == Decimal('0.125')
+    with pytest.raises(OperationError, match="Negative exponents are not supported"):
+        Calculation(operation="Power", operand1=Decimal("2"), operand2=Decimal("-3"))
+
 
 def test_root():
-    calc = Calculator()
-    result = calc.square_root(operation="Root", operands=[Decimal('16.0')])
-    assert result == Decimal('4.0')
+    calc = Calculation(operation="Root", operand1=Decimal("16"), operand2=Decimal("2"))
+    assert calc.result == Decimal("4")
+
 
 def test_invalid_root():
-    calc = Calculator()
-    with pytest.raises(OperationError, match="Cannot calculate the root of a negative number."):
-        calc.square_root(operation="Root", operands=[Decimal('-16.0')])
+    with pytest.raises(OperationError, match="Cannot calculate root of negative number"):
+        Calculation(operation="Root", operand1=Decimal("-16"), operand2=Decimal("2"))
 
-def test_modulus():
-    calc = Calculator()
-    result = calc.modulus(operation="Modulus", operands=[Decimal('10.0'), Decimal('3.0')])
-    assert result == Decimal('1.0')
 
-def test_invalid_modulus():
-    calc = Calculator()
-    with pytest.raises(OperationError, match="Cannot perform modulus operation with a divisor of zero."):
-        calc.modulus(operation="Modulus", operands=[Decimal('10.0'), Decimal('0.0')])
-
-def test_percent():
-    calc = Calculator()
-    result = calc.percent(operation="Percent", operands=[Decimal('50.0'), Decimal('200.0')])
-    assert result == Decimal('100.0')
-
-def test_absolute_difference():
-    calc = Calculator()
-    result = calc.absolute_difference(operation="Absolute Difference", operands=[Decimal('5.0'), Decimal('3.0')])
-    assert result == Decimal('2.0')
+def test_root_zero_degree():
+    """Test that calculating the root with degree zero raises an OperationError."""
+    with pytest.raises(OperationError, match="Division by zero is not allowed"):
+        Calculation("Root", Decimal("16"), Decimal("0"))
 
 def test_unknown_operation():
-    calc = Calculator()
-    with pytest.raises(OperationError, match="Unknown operation: Unknown"):
-        calc.add(operation="Unknown", operands=[Decimal('1.0'), Decimal('2.0')])
+    with pytest.raises(OperationError, match="Unknown operation"):
+        Calculation(operation="Unknown", operand1=Decimal("5"), operand2=Decimal("3"))
+
 
 def test_to_dict():
-    calc = Calculator()
-    result = calc.to_dict(operation="Addition", operands=[Decimal('2.5'), Decimal('3.5')], result=Decimal('6.0'))
-    assert result == {
+    calc = Calculation(operation="Addition", operand1=Decimal("2"), operand2=Decimal("3"))
+    result_dict = calc.to_dict()
+    assert result_dict == {
         "operation": "Addition",
-        "operands": [Decimal('2.5'), Decimal('3.5')],
-        "result": Decimal('6.0'),
-        "timestamp": result["timestamp"]  # We can't assert the exact timestamp, but we can check its presence
+        "operand1": "2",
+        "operand2": "3",
+        "result": "5",
+        "timestamp": calc.timestamp.isoformat()
     }
 
+
 def test_from_dict():
-    calc = Calculator()
     data = {
         "operation": "Addition",
-        "operands": [Decimal('2.5'), Decimal('3.5')],
-        "result": Decimal('6.0'),
+        "operand1": "2",
+        "operand2": "3",
+        "result": "5",
         "timestamp": datetime.now().isoformat()
     }
     calc = Calculation.from_dict(data)
     assert calc.operation == "Addition"
-    assert calc.operands == [Decimal('2.5'), Decimal('3.5')]
-    assert calc.result == Decimal('6.0')
+    assert calc.operand1 == Decimal("2")
+    assert calc.operand2 == Decimal("3")
+    assert calc.result == Decimal("5")
+
 
 def test_invalid_from_dict():
     data = {
         "operation": "Addition",
-        "operands": [Decimal('2.5'), Decimal('3.5')],
-        # Missing 'result' and 'timestamp'
+        "operand1": "invalid",
+        "operand2": "3",
+        "result": "5",
+        "timestamp": datetime.now().isoformat()
     }
-    with pytest.raises(OperationError, match="Invalid data for Calculation.from_dict: missing required fields."):
+    with pytest.raises(OperationError, match="Invalid calculation data"):
         Calculation.from_dict(data)
 
+
 def test_format_result():
-    calc = Calculator()
-    result = calc.format_result(Decimal('6.0'))
-    assert result == '6.0'
+    calc = Calculation(operation="Division", operand1=Decimal("1"), operand2=Decimal("3"))
+    assert calc.format_result(precision=2) == "0.33"
+    assert calc.format_result(precision=10) == "0.3333333333"
+
 
 def test_equality():
-    calc1 = Calculator()
-    calc2 = Calculator()
-    calc3 = Calculator()
-    result1 = calc1.add(operation="Addition", operands=[Decimal('2.5'), Decimal('3.5')])
-    result2 = calc2.add(operation="Addition", operands=[Decimal('2.5'), Decimal('3.5')])
-    result3 = calc1.add(operation="Subtraction", operands=[Decimal('2.5'), Decimal('4.5')])
-    assert result1 == result2
-    assert result1 != result3
+    calc1 = Calculation(operation="Addition", operand1=Decimal("2"), operand2=Decimal("3"))
+    calc2 = Calculation(operation="Addition", operand1=Decimal("2"), operand2=Decimal("3"))
+    calc3 = Calculation(operation="Subtraction", operand1=Decimal("5"), operand2=Decimal("3"))
+    assert calc1 == calc2
+    assert calc1 != calc3
 
-def test_logging(caplog):
-    calc = Calculator()
-    with caplog.at_level(logging.INFO):
-        calc.add(operation="Addition", operands=[Decimal('2.5'), Decimal('3.5')])
-    assert "Performed Addition on operands [Decimal('2.5'), Decimal('3.5')] with result Decimal('6.0')" in caplog.text
 
-# Logging test for error handling
-def test_logging_error(caplog):
-    calc = Calculator()
-    with caplog.at_level(logging.ERROR):
-        with pytest.raises(OperationError):
-            calc.divide(operation="Division", operands=[Decimal('6.0'), Decimal('0.0')])
-    assert "Error during Division: Cannot divide by zero." in caplog.text
-
-# Logging warning record test
-def test_logging_warning(caplog):
+# New Test to Cover Logging Warning
+def test_from_dict_result_mismatch(caplog):
     """
-    Test that a warning is logged when a saved calculation 
-    from the dictionary does not match the expected result.
+    Test the from_dict method to ensure it logs a warning when the saved result
+    does not match the computed result.
     """
     # Arrange
     data = {
         "operation": "Addition",
-        "operands": [Decimal('2.5'), Decimal('3.5')],
-        "result": Decimal('5.0'),  # Intentionally incorrect result
+        "operand1": "2",
+        "operand2": "3",
+        "result": "10",  # Incorrect result to trigger logging.warning
         "timestamp": datetime.now().isoformat()
     }
 
@@ -155,45 +134,60 @@ def test_logging_warning(caplog):
         calc = Calculation.from_dict(data)
 
     # Assert
-    assert "Warning: The result from the saved calculation does not match the expected result." in caplog.text
+    assert "Loaded calculation result 10 differs from computed result 5" in caplog.text
 
 def test_calculation_overflow():
-    calc = Calculator()
-    with pytest.raises(OperationError, match="Calculation result overflowed the maximum allowed value."):
-        calc.add(operation="Addition", operands=[Decimal('1e+1000'), Decimal('1e+1000')])
+    """Test that calculation failures (like OverflowError) are caught and wrapped in OperationError."""
+    with pytest.raises(OperationError, match="Calculation failed"):
+        # float(10) ** 1000 will raise an OverflowError (subclass of ArithmeticError)
+        Calculation(operation="Power", operand1=Decimal("10"), operand2=Decimal("1000"))
 
-def test_format_result_invalid():
-    """Test that formatting infinity or NaN raises an OperationError."""
-    calc = Calculator()
-    with pytest.raises(OperationError):
-        calc.format_result(float('inf'))
-
-def test_format_result_nan():
-    """Test that formatting NaN raises an OperationError."""
-    calc = Calculator()
-    with pytest.raises(OperationError):
-        calc.format_result(float('nan'))
-
-# Quantizing Infinity raises an InvalidOperation error, so we need to handle that in the format_result method.
-assert calc.format_result(Decimal('Infinity')) == 'Infinity'
+def test_format_result_invalid_operation():
+    """Test that format_result handles InvalidOperation (e.g., when result is Infinity)."""
+    # Adding Infinity to 1 results in Decimal('Infinity')
+    calc = Calculation(operation="Addition", operand1=Decimal("Infinity"), operand2=Decimal("1"))
+    
+    # Quantizing Infinity raises InvalidOperation, which should be caught and return the raw string
+    assert calc.format_result() == "Infinity"
 
 def test_equality_not_implemented():
-    """Test that equality comparison with a non-Calculation object returns NotImplemented."""
-    calc = Calculator()
-    result = calc.add(operation="Addition", operands=[Decimal('2.5'), Decimal('3.5')])
-    assert (result == "not a calculation") is False
-
-assert calc1 != "not a calculation"
-assert calc1 != 5
+    """Test that comparing a Calculation to a non-Calculation object returns NotImplemented."""
+    calc1 = Calculation(operation="Addition", operand1=Decimal("2"), operand2=Decimal("3"))
+    
+    # Comparing to a string should fall back to identity comparison (which is False for !=)
+    # but internally it exercises the `return NotImplemented` branch.
+    assert calc1 != "not a calculation"
+    assert calc1 != 123
 
 def test_str_representation():
-    calc = Calculator()
-    result = calc.add(operation="Addition", operands=[Decimal('2.5'), Decimal('3.5')])
-    assert str(result) == "Calculation(operation='Addition', operands=[Decimal('2.5'), Decimal('3.5')], result=Decimal('6.0'), timestamp=" + str(result.timestamp) + ")"
+    """
+    Test the __str__ method returns the correct human-readable format.
+    """
+    calc = Calculation(operation="Addition", operand1=Decimal("2"), operand2=Decimal("3"))
+    
+    # Act
+    result_str = str(calc)
+    
+    # Assert
+    assert result_str == "Addition(2, 3) = 5"
+
 
 def test_repr_representation():
-    calc = Calculator()
-    result = calc.add(operation="Addition", operands=[Decimal('2.5'), Decimal('3.5')])
-    assert repr(result) == "Calculation(operation='Addition', operands=[Decimal('2.5'), Decimal('3.5')], result=Decimal('6.0'), timestamp=" + str(result.timestamp) + ")"
-
-assert result_repr() == result
+    """
+    Test the __repr__ method returns the correct detailed format for debugging.
+    """
+    calc = Calculation(operation="Addition", operand1=Decimal("2"), operand2=Decimal("3"))
+    
+    # Act
+    result_repr = repr(calc)
+    
+    # Assert
+    # Note: Decimal objects in f-strings do not include quotes, so operand1=2, not '2'
+    expected_repr = (
+        f"Calculation(operation='Addition', "
+        f"operand1=2, "
+        f"operand2=3, "
+        f"result=5, "
+        f"timestamp='{calc.timestamp.isoformat()}')"
+    )
+    assert result_repr == expected_repr
