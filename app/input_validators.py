@@ -14,19 +14,7 @@ class InputValidator:
     
     @staticmethod
     def validate_number(value: Any, config: CalculatorConfig) -> Decimal:
-        """
-        Validate and convert input to Decimal.
         
-        Args:
-            value: Input value to validate
-            config: Calculator configuration
-            
-        Returns:
-            Decimal: Validated and converted number
-            
-        Raises:
-            ValidationError: If input is invalid
-        """
         try:
             if isinstance(value, str):
                 value = value.strip()

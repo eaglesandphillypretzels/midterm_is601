@@ -14,7 +14,7 @@ class Operation(ABC):
         pass  # pragma: no cover
 
     def validate_operands(self, a: Decimal, b: Decimal) -> None:
-        pass
+        pass # pragma: no cover
 
     def __str__(self) -> str:
         return self.__class__.__name__
@@ -24,54 +24,37 @@ class Addition(Operation):
         """Add two numbers."""
         self.validate_operands(a, b)
         return a + b
-
-
 class Subtraction(Operation):
     def execute(self, a: Decimal, b: Decimal) -> Decimal:
         """Subtract one number from another."""
         self.validate_operands(a, b)
         return a - b
-
 class Multiplication(Operation):
     def execute(self, a: Decimal, b: Decimal) -> Decimal:
         """Multiply two numbers."""
         self.validate_operands(a, b)
         return a * b
-
 class Division(Operation):
     def validate_operands(self, a: Decimal, b: Decimal) -> None:
-        """
-        Validate operands, checking for division by zero.
 
-        Overrides the base class method to ensure that the divisor is not zero.
-
-        Args:
-            a (Decimal): Dividend.
-            b (Decimal): Divisor.
-
-        Raises:
-            ValidationError: If the divisor is zero.
-        """
         super().validate_operands(a, b)
         if b == 0:
             raise ValidationError("Division by zero is not allowed")
-
+        
     def execute(self, a: Decimal, b: Decimal) -> Decimal:
         """Divide one number by another."""
         self.validate_operands(a, b)
         return a / b
-
 class Power(Operation):
     def validate_operands(self, a: Decimal, b: Decimal) -> None:
         super().validate_operands(a, b)
         if b < 0:
             raise ValidationError("Negative exponents are not supported")
-
+        
     def execute(self, a: Decimal, b: Decimal) -> Decimal:
         """Raise a number to the power of another number."""
         self.validate_operands(a, b)
         return Decimal(str(pow(float(a), float(b))))
-
 class Root(Operation):
     def validate_operands(self, a: Decimal, b: Decimal) -> None:
         super().validate_operands(a, b)
@@ -84,7 +67,6 @@ class Root(Operation):
         """Find the nth root of a number."""
         self.validate_operands(a, b)
         return Decimal(pow(float(a), 1 / float(b)))
-
 class Modulus(Operation):
     def validate_operands(self, a: Decimal, b: Decimal) -> None:
         super().validate_operands(a, b)
@@ -97,8 +79,6 @@ class Modulus(Operation):
         """Return the remainder after dividing one number by another."""
         self.validate_operands(a, b)
         return a % b
-
-
 class Percent(Operation):
     def validate_operands(self, a: Decimal, b: Decimal) -> None:
         super().validate_operands(a, b)
@@ -109,8 +89,6 @@ class Percent(Operation):
         """Return the percentage of one number relative to another."""
         self.validate_operands(a, b)
         return (a / b) * Decimal("100")
-
-
 class AbsoluteDifference(Operation):
     def validate_operands(self, a: Decimal, b: Decimal) -> None:
         super().validate_operands(a, b)
@@ -119,11 +97,8 @@ class AbsoluteDifference(Operation):
         """Return the absolute value of the difference between two numbers."""
         self.validate_operands(a, b)
         return abs(a - b)
-
-
 class OperationFactory:
     """Create operation instances by the names used in the calculator."""
-
     _operations = {
         "Addition": Addition,
         "addition": Addition,

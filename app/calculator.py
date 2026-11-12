@@ -86,3 +86,24 @@ class Calculator:
             # Validate and convert inputs to Decimal
             validated_a = InputValidator.validate_number(a, self.config)
             validated_b = InputValidator.validate_number(b, self.config)
+
+             # Execute the operation strategy
+            result = self.operation_strategy.execute(validated_a, validated_b)
+
+            # Create a new Calculation instance with the operation details
+            calculation = Calculation(
+                operation=str(self.operation_strategy),
+                operand1=validated_a,
+                operand2=validated_b
+            )
+
+            # Save the current state to the undo stack before making changes
+            self.undo_stack.append(CalculatorMemento(self.history.copy()))
+
+            # Clear the redo stack since new operation invalidates the redo history
+            self.redo_stack.clear()
+
+            # Append the new calculation to the history
+            self.history.append(calculation)
+
+            # Ensure the history does not exceed the maximum size
