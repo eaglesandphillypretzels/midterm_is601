@@ -77,6 +77,7 @@ class TestAddition(BaseOperationTest):
     }
     invalid_test_cases = {}  # Addition has no invalid cases
 
+
 class TestSubtraction(BaseOperationTest):
     """Test Subtraction operation."""
 
@@ -134,4 +135,117 @@ class TestDivision(BaseOperationTest):
             "message": "Division by zero is not allowed"
         },
     }
+
+
+class TestPower(BaseOperationTest):
+    """Test Power operation."""
+
+    operation_class = Power
+    valid_test_cases = {
+        "positive_integers": {"a": "2", "b": "3", "expected": "8"},
+        "negative_base": {"a": "-2", "b": "3", "expected": "-8"},
+        "fractional_exponent": {"a": "9", "b": "0.5", "expected": "3"},
+        "zero_power": {"a": "5", "b": "0", "expected": "1"},
+        "zero_base": {"a": "0", "b": "5", "expected": "0"},
+    }
+    invalid_test_cases = {
+        "negative_exponent": {
+            "a": "4",
+            "b": "-1",
+            "error": ValidationError,
+            "message": "Exponent cannot be negative"
+        },
+    }
+
+
+class TestRoot(BaseOperationTest):
+    """Test Root operation."""
+
+    operation_class = Root
+    valid_test_cases = {
+        "square_root": {"a": "9", "b": "2", "expected": "3"},
+        "cube_root": {"a": "8", "b": "3", "expected": "2"},
+        "zero_root": {"a": "0", "b": "5", "expected": "0"},
+        "negative_radicand": {"a": "-8", "b": "3", "expected": "-2"},
+    }
+    invalid_test_cases = {
+        "negative_index": {
+            "a": "8",
+            "b": "-1",
+            "error": ValidationError,
+            "message": "Root index cannot be negative"
+        },
+        "zero_index": {
+            "a": "8",
+            "b": "0",
+            "error": ValidationError,
+            "message": "Root index cannot be zero"
+        },
+    }
+
+
+class TestModulus(BaseOperationTest):
+    """Test Modulus operation."""
+
+    operation_class = Modulus
+    valid_test_cases = {
+        "positive_numbers": {"a": "7", "b": "3", "expected": "1"},
+        "negative_numbers": {"a": "-7", "b": "3", "expected": "-1"},
+        "zero_remainder": {"a": "8", "b": "4", "expected": "0"},
+        "decimal_remainder": {"a": "7.5", "b": "2.5", "expected": "0"},
+    }
+    invalid_test_cases = {
+        "divide_by_zero": {
+            "a": "5",
+            "b": "0",
+            "error": ValidationError,
+            "message": "Modulus by zero is not allowed"
+        },
+    }
+
+
+class TestAbsoluteDifference(BaseOperationTest):
+    """Test Absolute Difference operation."""
+
+    operation_class = AbsoluteDifference
+    valid_test_cases = {
+        "positive_numbers": {"a": "5", "b": "3", "expected": "2"},
+        "negative_numbers": {"a": "-5", "b": "-3", "expected": "2"},
+        "mixed_signs": {"a": "-5", "b": "3", "expected": "8"},
+        "zero_difference": {"a": "5", "b": "5", "expected": "0"},
+        "decimals": {"a": "5.5", "b": "3.3", "expected": "2.2"},
+    }
+    invalid_test_cases = {}
+
+
+class TestOperationFactory:
+    """Test operation factory."""
+
+    def test_create_addition(self):
+        assert isinstance(OperationFactory.create("+"), Addition)
+
+    def test_create_subtraction(self):
+        assert isinstance(OperationFactory.create("-"), Subtraction)
+
+    def test_create_multiplication(self):
+        assert isinstance(OperationFactory.create("*"), Multiplication)
+
+    def test_create_division(self):
+        assert isinstance(OperationFactory.create("/"), Division)
+
+    def test_create_power(self):
+        assert isinstance(OperationFactory.create("^"), Power)
+
+    def test_create_root(self):
+        assert isinstance(OperationFactory.create("root"), Root)
+
+    def test_create_modulus(self):
+        assert isinstance(OperationFactory.create("%"), Modulus)
+
+    def test_create_absolute_difference(self):
+        assert isinstance(OperationFactory.create("absdiff"), AbsoluteDifference)
+
+    def test_create_invalid_operation(self):
+        with pytest.raises(ValidationError, match="Unsupported operation"):
+            OperationFactory.create("invalid")
 

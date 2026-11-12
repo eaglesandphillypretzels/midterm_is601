@@ -34,24 +34,34 @@ class Calculator:
         self._setup_logging()
 
         self.history: List[Calculation] = []
-        self.operation_strategy: Optional
-        [Operation] = None
+        self.operation_strategy: Optional[Operation] = None
 
         self.observers: List[HistoryObserver] = []
 
         self.undo_stack: List[CalculatorMemento] = []
         self.redo_stack: List[CalculatorMemento] = []
 
-        self._setup_directories()
+        self._setup_logging()
 
+    def _setup_logging(self) -> None:
+        
         try:
-            self.load_history()
+            # Ensure the log directory e
+            os.makedirs(self.config.log_dir, exist_ok=True)
+            log_file = self.config.log_file.resolve()
+
+            logging.basicConfig(
+                filename=str(log_file),
+                level=logging.INFO,
+                format='%(asctime)s - %(levelname)s - %(message)s',
+                force=True  # Overwrite any existing logging configuration
+            )
         except Exception as e:
-            logging.warning(f"Could not load existing history: {e}")
+            print(f"Could not load existing history: {e}")
 
         logging.info("Calculator initialized with configuration")
 
-    def _setup_logging(self) -> None:
+    def _setup_directories(self) -> None:
         """
         Confirms the existence of all necessary directories for history management.
         """
@@ -157,3 +167,48 @@ class Calculator:
             logging.error(f"Failed to save history: {e}")
             raise OperationError(f"Failed to save history: {e}")
 
+    def get_history_dataframe(self) -> pd.DataFrame:
+        history_data = []
+        for calc in self.history:
+            history_data.append({
+                'operation': str(calc.operation),
+                'operand1': str(calc.operand1),
+                'operand2': str(calc.operand2),
+                'result': str(calc.result),
+                'timestamp': calc.timestamp
+            })
+        return pd.DataFrame(history_data)
+
+    def show_history(self) -> List[str]:
+        return [
+            f"{calc.operation}({calc.operand1}, {calc.operand2}) = {calc.result}"
+            for calc in self.history
+        ]
+
+    def clear_history(self) -> None:
+        self.history.clear()
+        self.undo_stack.clear()
+        self.redo_stack.clear()
+        logging.info("History cleared")
+
+    def undo(self) -> bool:
+        if not self.undo_stack:
+            return False
+        # Pop the last state from the undo stack
+        memento = self.undo_stack.pop()
+        # Push the current state onto the redo stack
+        self.redo_stack.append(CalculatorMemento(self.history.copy()))
+        # Restore the history from the memento
+        self.history = memento.history.copy()
+        return True
+
+    def redo(self) -> bool:
+        if not self.redo_stack:
+            return False
+        # Pop the last state from the redo stack
+        memento = self.redo_stack.pop()
+        # Push the current state onto the undo stack
+        self.undo_stack.append(CalculatorMemento(self.history.copy()))
+        # Restore the history from the memento
+        self.history = memento.history.copy()
+        return True

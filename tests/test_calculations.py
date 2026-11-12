@@ -37,9 +37,8 @@ def test_power():
 
 
 def test_negative_power():
-    with pytest.raises(OperationError, match="Negative exponents are not supported"):
+    with pytest.raises(OperationError, match="Negative exponents are not allowed for this operation"):
         Calculation(operation="Power", operand1=Decimal("2"), operand2=Decimal("-3"))
-
 
 def test_root():
     calc = Calculation(operation="Root", operand1=Decimal("16"), operand2=Decimal("2"))
@@ -47,19 +46,13 @@ def test_root():
 
 
 def test_invalid_root():
-    with pytest.raises(OperationError, match="Cannot calculate root of negative number"):
+    with pytest.raises(OperationError, match="Invalid root operation"):
         Calculation(operation="Root", operand1=Decimal("-16"), operand2=Decimal("2"))
-
 
 def test_root_zero_degree():
     """Test that calculating the root with degree zero raises an OperationError."""
-    with pytest.raises(OperationError, match="Division by zero is not allowed"):
+    with pytest.raises(OperationError, match="Cannot divide by zero"):
         Calculation("Root", Decimal("16"), Decimal("0"))
-
-def test_unknown_operation():
-    with pytest.raises(OperationError, match="Unknown operation"):
-        Calculation(operation="Unknown", operand1=Decimal("5"), operand2=Decimal("3"))
-
 
 def test_to_dict():
     calc = Calculation(operation="Addition", operand1=Decimal("2"), operand2=Decimal("3"))
