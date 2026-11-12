@@ -65,45 +65,34 @@ class Calculation:
         }
 
     @staticmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "Calculation":
+    def from_dict(data: Dict[str, Any]) -> "Calculation":
         try:
-            operation = data["operation"]
-            operand1 = Decimal(str(data["operand1"]))
-            operand2 = Decimal(str(data["operand2"]))
-            result = Decimal(str(data["result"]))
-            timestamp_value = data.get("timestamp")
-        except (KeyError, TypeError, ValueError, InvalidOperation) as exc:
-            raise OperationError("Invalid calculation data") from exc
-
-        calc = cls(operation=operation, operand1=operand1, operand2=operand2)
-
-        if result != calc.result:
-            logging.warning(
-                "Loaded calculation result %s differs from computed result %s",
-                result,
-                calc.result,
+            calc = Calculation(
+                operation=data["operation"],
+                operand1 = Decimal(data['operand1']),
+                operand2 = Decimal(data["operand2"])
             )
 
-        if timestamp_value is not None:
-            try:
-                calc.timestamp = datetime.datetime.fromisoformat(str(timestamp_value))
-            except ValueError:
-                pass
+            calc.timestamp = datetime.datetime.fromisoformat(data["timestamp"])
 
-        return calc
+            saved_result = Decimal(data['result'])
+            if calc.result != saved_result:
+                logging.warning(
+                    f"Loaded calculation result {saved_result} "
+                    f"differs from computed result {calc.result}"
+                )  # pragma: no cover
+
+            return calc
+
+        except (KeyError, InvalidOperation, ValueError) as e:
+            raise OperationError(f"Invalid calculation data: {str(e)}")
 
     def format_result(self, precision: int = 2) -> str:
         try:
-            if self.result.is_infinite() or self.result.is_nan():
-                return str(self.result)
-
-            quant = Decimal("1").scaleb(-precision)
-            quantized = self.result.quantize(quant, rounding=ROUND_HALF_UP)
-            formatted = format(quantized, "f")
-            if "." in formatted:
-                formatted = formatted.rstrip("0").rstrip(".")
-            return formatted if formatted else "0"
-        except (InvalidOperation, ValueError, ArithmeticError):
+            return str(self.result.normalize().quantize(
+                Decimal("0." + "0" * precision)
+            ).normalize())
+        except InvalidOperation: # pragma: no cover
             return str(self.result)
 
     def __str__(self) -> str:
