@@ -121,34 +121,41 @@ class AbsoluteDifference(Operation):
         return abs(a - b)
 
 
-class UnknownOperation(Operation):
-    def validate_operands(self, a: Decimal, b: Decimal) -> None:
-        raise ValidationError("Unknown operation")
-
-    def execute(self, a: Decimal, b: Decimal) -> Decimal:
-        """Raise a validation error for unsupported operations."""
-        self.validate_operands(a, b)
-        raise ValidationError("Unknown operation")
-
-
 class OperationFactory:
     """Create operation instances by the names used in the calculator."""
 
     _operations = {
         "Addition": Addition,
+        "addition": Addition,
+        "Add": Addition,
+        "add": Addition,
         "Subtraction": Subtraction,
+        "subtraction": Subtraction,
+        "Subtract": Subtraction,
+        "subtract": Subtraction,
         "Multiplication": Multiplication,
+        "multipliation": Multiplication,
+        "Multiply": Multiplication,
+        "multiply": Multiplication,
         "Division": Division,
+        "division": Division,
+        "Divide": Division,
+        "divide": Division,
         "Power": Power,
+        "power": Power,
         "Root": Root,
+        "root": Root,
         "Modulus": Modulus,
+        "modulus": Modulus,
+        "Modulo": Modulus,
+        "modulo": Modulus,
         "Percent": Percent,
+        "percent": Percent,
         "Absolute Difference": AbsoluteDifference,
         "AbsoluteDifference": AbsoluteDifference,
         "absolute difference": AbsoluteDifference,
-        "Unknown": UnknownOperation,
-        "UnknownOperation": UnknownOperation,
-    }
+        "absolutedifference": AbsoluteDifference
+            }
 
     @classmethod
     def create(cls, name: str) -> Operation:
