@@ -64,7 +64,7 @@ class Calculation:
             "timestamp": self.timestamp.isoformat(),
         }
 
-    @classmethod
+    @staticmethod
     def from_dict(cls, data: Dict[str, Any]) -> "Calculation":
         try:
             operation = data["operation"]
