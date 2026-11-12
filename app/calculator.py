@@ -87,7 +87,7 @@ class Calculator:
             validated_a = InputValidator.validate_number(a, self.config)
             validated_b = InputValidator.validate_number(b, self.config)
 
-             # Execute the operation strategy
+            # Execute the operation strategy
             result = self.operation_strategy.execute(validated_a, validated_b)
 
             # Create a new Calculation instance with the operation details
@@ -125,4 +125,35 @@ class Calculator:
             raise OperationError(f"Operation failed: {str(e)}")
 
     def save_history(self) -> None:
-        
+        try:
+            # Ensure the history directory exists
+            self.config.history_dir.mkdir(parents=True, exist_ok=True)
+
+            history_data = []
+            for calc in self.history:
+                # Serialize each Calculation instance to a dictionary
+                history_data.append({
+                    'operation': str(calc.operation),
+                    'operand1': str(calc.operand1),
+                    'operand2': str(calc.operand2),
+                    'result': str(calc.result),
+                    'timestamp': calc.timestamp.isoformat()
+                })
+
+            if history_data:
+                # Create a pandas DataFrame from the history data
+                df = pd.DataFrame(history_data)
+                # Write the DataFrame to a CSV file without the index
+                df.to_csv(self.config.history_file, index=False)
+                logging.info(f"History saved successfully to {self.config.history_file}")
+            else:
+                # If history is empty, create an empty CSV with headers
+                pd.DataFrame(columns=['operation', 'operand1', 'operand2', 'result', 'timestamp']
+                        ).to_csv(self.config.history_file, index=False)
+                logging.info("Empty history saved")
+
+        except Exception as e:
+            # Log and raise an OperationError if saving fails
+            logging.error(f"Failed to save history: {e}")
+            raise OperationError(f"Failed to save history: {e}")
+
