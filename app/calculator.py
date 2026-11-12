@@ -107,3 +107,22 @@ class Calculator:
             self.history.append(calculation)
 
             # Ensure the history does not exceed the maximum size
+            if len(self.history) > self.config.max_history_size:
+                self.history.pop(0)
+
+            # Notify all observers about the new calculation
+            self.notify_observers(calculation)
+
+            return result
+
+        except ValidationError as e:
+            # Log and re-raise validation errors
+            logging.error(f"Validation error: {str(e)}")
+            raise
+        except Exception as e:
+            # Log and raise operation errors for any other exceptions
+            logging.error(f"Operation failed: {str(e)}")
+            raise OperationError(f"Operation failed: {str(e)}")
+
+    def save_history(self) -> None:
+        
