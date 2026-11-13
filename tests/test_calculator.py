@@ -6,6 +6,7 @@ from unittest.mock import Mock, patch, PropertyMock
 from decimal import Decimal
 from tempfile import TemporaryDirectory
 from app.calculator import Calculator
+from app.calculation import Calculation
 from app.calculator_repl import calculator_repl
 from app.calculator_config import CalculatorConfig
 from app.exceptions import OperationError, ValidationError
@@ -181,3 +182,16 @@ def test_calculation_root_zero_degree():
     """Cover the Root zero-degree branch."""
     with pytest.raises(OperationError):
         Calculation(operation="Root", operand1=Decimal("16"), operand2=Decimal("0"))
+
+def test_remove_observer(calculator):
+    """Cover line 68: remove_observer logging."""
+    obs = LoggingObserver()
+    calculator.add_observer(obs)
+    calculator.remove_observer(obs)
+    assert obs not in calculator.observers
+
+def test_save_empty_history(calculator):
+    """Cover line 121: logging.info('Empty history saved')."""
+    calculator.clear_history()
+    calculator.save_history()
+    assert calculator.config.history_file.exists()

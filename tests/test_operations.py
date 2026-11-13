@@ -324,3 +324,15 @@ def test_percent_zero_division_final():
     op = Percent()
     with pytest.raises(ValidationError, match="Percent calculation cannot divide by zero"):
         op.execute(Decimal("50"), Decimal("0"))
+
+def test_modulus_negative():
+    """Cover lines 71-75: Modulus validation for negative divisors."""
+    op = Modulus()
+    with pytest.raises(ValidationError):
+        op.execute(Decimal("5"), Decimal("-2"))
+
+def test_percent_zero():
+    """Cover line 102: Percent validation for division by zero."""
+    op = Percent()
+    with pytest.raises(ValidationError):
+        op.execute(Decimal("50"), Decimal("0"))

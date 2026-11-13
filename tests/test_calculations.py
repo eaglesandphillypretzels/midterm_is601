@@ -199,3 +199,12 @@ def test_calculation_division_by_zero():
     """Cover the second except block when operation.execute fails."""
     with pytest.raises(OperationError):
         Calculation(operation="Division", operand1=Decimal("1"), operand2=Decimal("0"))
+def test_calculation_invalid_op():
+    """Cover lines 29-31: OperationFactory fails."""
+    with pytest.raises(OperationError):
+        Calculation(operation="FakeOp", operand1=Decimal("1"), operand2=Decimal("2"))
+
+def test_calculation_div_zero():
+    """Cover lines 35-41: operation.execute fails."""
+    with pytest.raises(OperationError):
+        Calculation(operation="Division", operand1=Decimal("1"), operand2=Decimal("0"))
