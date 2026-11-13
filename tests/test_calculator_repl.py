@@ -33,3 +33,39 @@ def test_exit_command(save_side_effect, expected_output, capsys):
     
     captured = capsys.readouterr()
     assert expected_output in captured.out
+
+@patch('builtins.input', side_effect=['help', 'history', 'add', '5', '3', 'history', 'undo', 'redo', 'clear', 'save', 'exit'])
+def test_repl_full_loop(mock_input, capsys):
+    calculator_repl()
+    captured = capsys.readouterr()
+    assert "Available commands" in captured.out
+    assert "No calculations in history" in captured.out
+    assert "Result: 8" in captured.out
+    assert "Operation undone" in captured.out
+    assert "Operation redone" in captured.out
+    assert "History cleared" in captured.out
+    assert "Goodbye" in captured.out
+
+@patch('builtins.input', side_effect=['add', 'cancel', 'exit'])
+def test_repl_cancel_operation(mock_input, capsys):
+    calculator_repl()
+    captured = capsys.readouterr()
+    assert "Operation cancelled" in captured.out
+
+@patch('builtins.input', side_effect=['unknown_cmd', 'exit'])
+def test_repl_unknown_command(mock_input, capsys):
+    calculator_repl()
+    captured = capsys.readouterr()
+    assert "Unknown command" in captured.out
+
+@patch('builtins.input', side_effect=[KeyboardInterrupt, 'exit'])
+def test_repl_keyboard_interrupt(mock_input, capsys):
+    calculator_repl()
+    captured = capsys.readouterr()
+    assert "Operation cancelled" in captured.out
+
+@patch('builtins.input', side_effect=EOFError)
+def test_repl_eof_error(mock_input, capsys):
+    calculator_repl()
+    captured = capsys.readouterr()
+    assert "Input terminated" in captured.out

@@ -249,3 +249,18 @@ class TestOperationFactory:
         with pytest.raises(ValidationError, match="Unsupported operation"):
             OperationFactory.create("invalid")
 
+def test_modulus_negative_divisor():
+    op = Modulus()
+    with pytest.raises(ValidationError, match="Cannot perform modulus operation with a negative divisor."):
+        op.execute(Decimal("5"), Decimal("-2"))
+
+def test_percent_zero_division():
+    op = Percent()
+    with pytest.raises(ValidationError, match="Percent calculation cannot divide by zero."):
+        op.execute(Decimal("5"), Decimal("0"))
+
+def test_get_available_operations():
+    ops = OperationFactory.get_available_operations()
+    assert isinstance(ops, dict)
+    assert "Addition" in ops
+

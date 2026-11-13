@@ -70,7 +70,7 @@ def test_save_and_show_history(calculator):
     # Show history
     history_str = calculator.show_history()
     assert len(history_str) == 1
-    def test_perform_operation_no_strategy(calculator):
+def test_perform_operation_no_strategy(calculator):
     with pytest.raises(OperationError, match="No operation set"):
         calculator.perform_operation(1, 2)
 
