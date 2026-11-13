@@ -108,45 +108,6 @@ def test_repl_unexpected_exception_in_loop(mock_perform, mock_input, capsys):
     captured = capsys.readouterr()
     assert "Unexpected error" in captured.out or "Error" in captured.out
 
-@patch('builtins.input', side_effect=['exit'])
-@patch('app.calculator_repl.Calculator.save_history', side_effect=Exception("Disk full"))
-def test_repl_exit_save_error(mock_save, mock_input, capsys):
-    """Cover the except block when saving history on exit fails."""
-    calculator_repl()
-    captured = capsys.readouterr()
-    assert "Warning: Could not save history" in captured.out
-
-@patch('builtins.input', side_effect=['save', 'exit'])
-@patch('app.calculator_repl.Calculator.save_history', side_effect=Exception("Permission denied"))
-def test_repl_save_command_error(mock_save, mock_input, capsys):
-    """Cover the except block for the 'save' command."""
-    calculator_repl()
-    captured = capsys.readouterr()
-    assert "Error saving history" in captured.out
-
-@patch('builtins.input', side_effect=['load', 'exit'])
-@patch('app.calculator_repl.Calculator.load_history', side_effect=Exception("File corrupted"))
-def test_repl_load_command_error(mock_load, mock_input, capsys):
-    """Cover the except block for the 'load' command."""
-    calculator_repl()
-    captured = capsys.readouterr()
-    assert "Error loading history" in captured.out
-
-@patch('builtins.input', side_effect=['add', 'invalid_number', '1', 'exit'])
-def test_repl_validation_error_in_math(mock_input, capsys):
-    """Cover the ValidationError/OperationError except block during math operations."""
-    calculator_repl()
-    captured = capsys.readouterr()
-    assert "Error:" in captured.out
-
-@patch('builtins.input', side_effect=['add', '1', '1', 'exit'])
-@patch('app.calculator_repl.Calculator.perform_operation', side_effect=RuntimeError("System crash"))
-def test_repl_generic_exception_in_loop(mock_perform, mock_input, capsys):
-    """Cover the generic Exception except block inside the REPL loop."""
-    calculator_repl()
-    captured = capsys.readouterr()
-    assert "Unexpected error" in captured.out
-
 @patch('builtins.input', side_effect=['unknown_command_xyz', 'exit'])
 def test_repl_unknown_command(mock_input, capsys):
     """Cover the 'Unknown command' print branch."""

@@ -294,3 +294,21 @@ def test_root_even_root_of_negative():
     op = Root()
     with pytest.raises(ValidationError, match="Invalid root operation"):
         op.execute(Decimal("-4"), Decimal("2"))  # Square root of -4
+
+def test_percent_zero_division():
+    """Cover the validation branch in Percent."""
+    op = Percent()
+    with pytest.raises(ValidationError, match="Percent calculation cannot divide by zero"):
+        op.execute(Decimal("50"), Decimal("0"))
+
+def test_modulus_negative_divisor():
+    """Cover the validation branch in Modulus for negative divisors."""
+    op = Modulus()
+    with pytest.raises(ValidationError, match="Cannot perform modulus operation with a negative divisor"):
+        op.execute(Decimal("5"), Decimal("-2"))
+
+def test_absolute_difference_execution():
+    """Cover the execute branch in AbsoluteDifference."""
+    op = AbsoluteDifference()
+    result = op.execute(Decimal("5"), Decimal("10"))
+    assert result == Decimal("5")
