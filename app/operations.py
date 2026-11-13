@@ -99,38 +99,29 @@ class AbsoluteDifference(Operation):
         return abs(a - b)
 class OperationFactory:
     """Create operation instances by the names used in the calculator."""
-    _operations = {
-        "Addition": Addition,
-        "addition": Addition,
-        "Add": Addition,
-        "add": Addition,
-        "Subtraction": Subtraction,
-        "subtraction": Subtraction,
-        "Subtract": Subtraction,
-        "subtract": Subtraction,
-        "Multiplication": Multiplication,
-        "multipliation": Multiplication,
-        "Multiply": Multiplication,
-        "multiply": Multiplication,
-        "Division": Division,
-        "division": Division,
-        "Divide": Division,
-        "divide": Division,
-        "Power": Power,
-        "power": Power,
-        "Root": Root,
-        "root": Root,
-        "Modulus": Modulus,
-        "modulus": Modulus,
-        "Modulo": Modulus,
-        "modulo": Modulus,
-        "Percent": Percent,
-        "percent": Percent,
-        "Absolute Difference": AbsoluteDifference,
-        "AbsoluteDifference": AbsoluteDifference,
-        "absolute difference": AbsoluteDifference,
-        "absolutedifference": AbsoluteDifference
-            }
+    operations = {
+        # Addition
+        "Addition": Addition, "addition": Addition, "Add": Addition, "add": Addition, "+": Addition,
+        # Subtraction
+        "Subtraction": Subtraction, "subtraction": Subtraction, "Subtract": Subtraction, "subtract": Subtraction, "-": Subtraction,
+        # Multiplication
+        "Multiplication": Multiplication, "multiplication": Multiplication, "Multiply": Multiplication, "multiply": Multiplication, "*": Multiplication, "x": Multiplication,
+        # Division
+        "Division": Division, "division": Division, "Divide": Division, "divide": Division, "/": Division,
+        # Power
+        "Power": Power, "power": Power, "^": Power, "**": Power,
+        # Root
+        "Root": Root, "root": Root,
+        # Modulus
+        "Modulus": Modulus, "modulus": Modulus, "Modulo": Modulus, "modulo": Modulus, "%": Modulus,
+        # Percent
+        "Percent": Percent, "percent": Percent,
+        # Absolute Difference
+        "Absolute Difference": AbsoluteDifference, "AbsoluteDifference": AbsoluteDifference,
+        "absolute difference": AbsoluteDifference, "absolutedifference": AbsoluteDifference, "absdiff": AbsoluteDifference
+    }
+    # Backward-compatible internal registry used by factory methods.
+    _operations = operations
 
     @classmethod
     def create(cls, name: str) -> Operation:
