@@ -141,3 +141,15 @@ def test_setup_logging_failure(mock_logging, capsys):
     calc = Calculator()
     captured = capsys.readouterr()
     assert "Could not load existing history" in captured.out or "Logging setup failed" in captured.out
+
+def test_add_and_remove_observer(calculator):
+    """Cover the add_observer and remove_observer methods."""
+    observer = LoggingObserver()
+    
+    # Add observer
+    calculator.add_observer(observer)
+    assert observer in calculator.observers
+    
+    # Remove observer
+    calculator.remove_observer(observer)
+    assert observer not in calculator.observers
