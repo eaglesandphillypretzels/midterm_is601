@@ -39,7 +39,7 @@ class Division(Operation):
 
         super().validate_operands(a, b)
         if b == 0:
-            raise ValidationError("Division by zero is not allowed")
+            raise ValidationError("Cannot divide by zero")
         
     def execute(self, a: Decimal, b: Decimal) -> Decimal:
         """Divide one number by another."""
@@ -49,7 +49,7 @@ class Power(Operation):
     def validate_operands(self, a: Decimal, b: Decimal) -> None:
         super().validate_operands(a, b)
         if b < 0:
-            raise ValidationError("Negative exponents are not supported")
+            raise ValidationError("Negative exponent is not allowed for this operation")
         
     def execute(self, a: Decimal, b: Decimal) -> Decimal:
         """Raise a number to the power of another number."""
@@ -59,9 +59,9 @@ class Root(Operation):
     def validate_operands(self, a: Decimal, b: Decimal) -> None:
         super().validate_operands(a, b)
         if a < 0:
-            raise ValidationError("Cannot calculate root of negative number")
+            raise ValidationError("Invalid root operation")
         if b == 0:
-            raise ValidationError("Zero root is undefined")
+            raise ValidationError("Division by zero is not allowed")
 
     def execute(self, a: Decimal, b: Decimal) -> Decimal:
         """Find the nth root of a number."""
