@@ -213,7 +213,7 @@ class Calculator:
         self.history = memento.history.copy()
         return True
 
-def load_history(self) -> None:
+    def load_history(self) -> None:
         """Load history from the CSV file."""
         if not self.config.history_file.exists():
             logging.info("No history file found to load")
