@@ -84,7 +84,7 @@ class Modulus(Operation):
         if b == 0:
             raise ValidationError("Modulus by zero is not allowed.")
         if b < 0:
-            raise ValidationError("Modulus by zero is not allowed.")
+            raise ValidationError("Cannot perform modulus operation with a negative divisor.")
 
     def execute(self, a: Decimal, b: Decimal) -> Decimal:
         """Return the remainder after dividing one number by another."""

@@ -112,6 +112,19 @@ def test_get_history_dataframe(calculator):
     calculator.set_operation(Addition())
     calculator.perform_operation(Decimal("5"), Decimal("3"))
     df = calculator.get_history_dataframe()
+    assert isinstance(df, pd.DataFrame)
     assert len(df) == 1
-    assert 'operation' in df.columns
+    assert df.iloc[0]['operation'] == 'Addition'
 
+def test_load_history(calculator):
+    # Save some history first
+    calculator.set_operation(Addition())
+    calculator.perform_operation(Decimal("10"), Decimal("5"))
+    calculator.save_history()
+    
+    # Clear and reload
+    calculator.clear_history()
+    assert len(calculator.history) == 0
+    
+    calculator.load_history()
+    assert len(calculator.history) == 1

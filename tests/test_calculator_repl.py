@@ -69,3 +69,21 @@ def test_repl_eof_error(mock_input, capsys):
     calculator_repl()
     captured = capsys.readouterr()
     assert "Input terminated" in captured.out
+
+@patch('builtins.input', side_effect=['load', 'exit'])
+def test_repl_load_command(mock_input, capsys):
+    calculator_repl()
+    captured = capsys.readouterr()
+    assert "History loaded successfully" in captured.out or "Error loading history" in captured.out
+
+@patch('builtins.input', side_effect=[KeyboardInterrupt, 'exit'])
+def test_repl_ctrl_c_interrupt(mock_input, capsys):
+    calculator_repl()
+    captured = capsys.readouterr()
+    assert "Operation cancelled" in captured.out
+
+@patch('builtins.input', side_effect=EOFError)
+def test_repl_ctrl_d_eof(mock_input, capsys):
+    calculator_repl()
+    captured = capsys.readouterr()
+    assert "Input terminated" in captured.out

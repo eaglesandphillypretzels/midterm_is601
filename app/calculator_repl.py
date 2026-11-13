@@ -111,7 +111,7 @@ def calculator_repl():
                             continue
 
                         # Create the appropriate operation instance using the Factory pattern
-                        operation = OperationFactory().create_operation(command)
+                        operation = OperationFactory().create(command)
                         calc.set_operation(operation)
 
                         # Perform the calculation

@@ -12,6 +12,7 @@ from app.operations import (
     Power,
     Root,
     Modulus,
+    Percent,
     AbsoluteDifference,
     OperationFactory,
 )

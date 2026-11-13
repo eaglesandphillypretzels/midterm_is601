@@ -212,3 +212,20 @@ class Calculator:
         # Restore the history from the memento
         self.history = memento.history.copy()
         return True
+
+def load_history(self) -> None:
+        """Load history from the CSV file."""
+        if not self.config.history_file.exists():
+            logging.info("No history file found to load")
+            return
+        
+        df = pd.read_csv(self.config.history_file)
+        self.history.clear()
+        for _, row in df.iterrows():
+            calc = Calculation(
+                operation=row['operation'],
+                operand1=Decimal(row['operand1']),
+                operand2=Decimal(row['operand2'])
+            )
+            self.history.append(calc)
+        logging.info("History loaded successfully")
