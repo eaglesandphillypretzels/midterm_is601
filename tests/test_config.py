@@ -57,3 +57,21 @@ def test_directory_properties():
     config = CalculatorConfig(base_dir=Path('/custom_base_dir'))
     assert config.log_dir == Path('/custom_base_dir/logs').resolve()
     assert config.history_dir == Path('/custom_base_dir/history').resolve()
+
+def test_config_validate_negative_history():
+    """Cover the validation for max_history_size."""
+    config = CalculatorConfig(max_history_size=-1)
+    with pytest.raises(ConfigurationError, match="max_history_size must be positive"):
+        config.validate()
+
+def test_config_validate_negative_precision():
+    """Cover the validation for precision."""
+    config = CalculatorConfig(precision=-1)
+    with pytest.raises(ConfigurationError, match="precision must be positive"):
+        config.validate()
+
+def test_config_validate_negative_max_input():
+    """Cover the validation for max_input_value."""
+    config = CalculatorConfig(max_input_value=Decimal("-1"))
+    with pytest.raises(ConfigurationError, match="max_input_value must be positive"):
+        config.validate()

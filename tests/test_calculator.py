@@ -115,12 +115,12 @@ def test_perform_operation_generic_exception(calculator):
             calculator.perform_operation(1, 2)
 
 def test_save_history_permission_error(calculator):
-    """Cover the except block in save_history when directory creation fails."""
+    """Cover the except block in save_history when writing fails."""
     calculator.set_operation(Addition())
     calculator.perform_operation(Decimal("1"), Decimal("1"))
     
-    # Mock os.makedirs to raise an exception
-    with patch('os.makedirs', side_effect=PermissionError("Permission denied")):
+    # Mock the pandas CSV writer to raise an OS error (simulating a permissions issue)
+    with patch('pandas.DataFrame.to_csv', side_effect=OSError("Permission denied")):
         with pytest.raises(OperationError, match="Failed to save history"):
             calculator.save_history()
 
