@@ -37,7 +37,7 @@ def test_logging_observer_logs_calculation(logging_info_mock, calculation_mock):
     observer.update(calculation_mock)
 
     logging_info_mock.assert_called_once_with(
-        "Calculation performed: addition (5, 3) = 8"
+        "Calculation performed: Addition (5, 3) = 8"
     )
 
 

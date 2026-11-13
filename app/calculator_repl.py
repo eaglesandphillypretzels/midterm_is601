@@ -5,6 +5,7 @@ from app.calculator import Calculator
 from app.exceptions import OperationError, ValidationError
 from app.history import AutoSaveObserver, LoggingObserver
 from app.operations import OperationFactory
+from unittest.mock import patch
 
 def calculator_repl():
     try:
@@ -150,4 +151,10 @@ def calculator_repl():
         print(f"Fatal error: {e}")
         logging.error(f"Fatal error in calculator REPL: {e}")
         raise
+
+@patch('builtins.input', side_effect=['5 + 3', 'history', 'undo', 'quit'])
+def test_repl_full_loop(mock_input, capsys):
+    calculator_repl()
+    captured = capsys.readouterr()
+    assert "8" in captured.out
 

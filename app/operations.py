@@ -58,10 +58,21 @@ class Power(Operation):
 class Root(Operation):
     def validate_operands(self, a: Decimal, b: Decimal) -> None:
         super().validate_operands(a, b)
-        if a < 0:
-            raise ValidationError("Invalid root operation")
         if b == 0:
-            raise ValidationError("Cannot divide by zero")
+            raise ValidationError("Root index cannot be zero")
+        if b < 0:
+            raise ValidationError("Root index cannot be negative")
+        # Prevent even roots of negative numbers (e.g., square root of -4)
+        if a < 0 and int(b) % 2 == 0:
+            raise ValidationError("Invalid root operation")
+
+    def execute(self, a: Decimal, b: Decimal) -> Decimal:
+        """Find the nth root of a number."""
+        self.validate_operands(a, b)
+        # Handle negative radicand for odd roots (e.g., cube root of -8 is -2)
+        if a < 0:
+            return -Decimal(str(pow(float(-a), 1 / float(b))))
+        return Decimal(str(pow(float(a), 1 / float(b))))
 
     def execute(self, a: Decimal, b: Decimal) -> Decimal:
         """Find the nth root of a number."""
@@ -99,26 +110,56 @@ class AbsoluteDifference(Operation):
         return abs(a - b)
 class OperationFactory:
     """Create operation instances by the names used in the calculator."""
-operations = {
+
+    _operations: Dict[str, type[Operation]] = {
         # Addition
-        "Addition": Addition, "addition": Addition, "Add": Addition, "add": Addition, "+": Addition,
+        "Addition": Addition,
+        "addition": Addition,
+        "Add": Addition,
+        "add": Addition,
+        "+": Addition,
         # Subtraction
-        "Subtraction": Subtraction, "subtraction": Subtraction, "Subtract": Subtraction, "subtract": Subtraction, "-": Subtraction,
+        "Subtraction": Subtraction,
+        "subtraction": Subtraction,
+        "Subtract": Subtraction,
+        "subtract": Subtraction,
+        "-": Subtraction,
         # Multiplication
-        "Multiplication": Multiplication, "multiplication": Multiplication, "Multiply": Multiplication, "multiply": Multiplication, "*": Multiplication, "x": Multiplication,
+        "Multiplication": Multiplication,
+        "multiplication": Multiplication,
+        "Multiply": Multiplication,
+        "multiply": Multiplication,
+        "*": Multiplication,
+        "x": Multiplication,
         # Division
-        "Division": Division, "division": Division, "Divide": Division, "divide": Division, "/": Division,
+        "Division": Division,
+        "division": Division,
+        "Divide": Division,
+        "divide": Division,
+        "/": Division,
         # Power
-        "Power": Power, "power": Power, "^": Power, "**": Power,
+        "Power": Power,
+        "power": Power,
+        "^": Power,
+        "**": Power,
         # Root
-        "Root": Root, "root": Root,
+        "Root": Root,
+        "root": Root,
         # Modulus
-        "Modulus": Modulus, "modulus": Modulus, "Modulo": Modulus, "modulo": Modulus, "%": Modulus,
+        "Modulus": Modulus,
+        "modulus": Modulus,
+        "Modulo": Modulus,
+        "modulo": Modulus,
+        "%": Modulus,
         # Percent
-        "Percent": Percent, "percent": Percent,
+        "Percent": Percent,
+        "percent": Percent,
         # Absolute Difference
-        "Absolute Difference": AbsoluteDifference, "AbsoluteDifference": AbsoluteDifference, 
-        "absolute difference": AbsoluteDifference, "absolutedifference": AbsoluteDifference, "absdiff": AbsoluteDifference
+        "Absolute Difference": AbsoluteDifference,
+        "AbsoluteDifference": AbsoluteDifference,
+        "absolute difference": AbsoluteDifference,
+        "absolutedifference": AbsoluteDifference,
+        "absdiff": AbsoluteDifference,
     }
 
     @classmethod
@@ -131,9 +172,12 @@ operations = {
             title_case_name = normalized_name.title()
             operation_class = cls._operations.get(title_case_name)
         if operation_class is None:
-            raise ValidationError(f"Unsupported operation")
+            raise ValidationError("Unsupported operation")
         return operation_class()
 
     @classmethod
     def get_available_operations(cls) -> Dict[str, type[Operation]]:
         return dict(cls._operations)
+
+
+operations = OperationFactory._operations

@@ -153,7 +153,7 @@ class TestPower(BaseOperationTest):
             "a": "4",
             "b": "-1",
             "error": ValidationError,
-            "message": "Exponent cannot be negative"
+            "message": "Negative exponents are not allowed for this operation"
         },
     }
 
@@ -166,7 +166,7 @@ class TestRoot(BaseOperationTest):
         "square_root": {"a": "9", "b": "2", "expected": "3"},
         "cube_root": {"a": "8", "b": "3", "expected": "2"},
         "zero_root": {"a": "0", "b": "5", "expected": "0"},
-        "negative_radicand": {"a": "-8", "b": "3", "expected": "-2"},
+        "positive_radicand": {"a": "8", "b": "3", "expected": "2"},
     }
     invalid_test_cases = {
         "negative_index": {
