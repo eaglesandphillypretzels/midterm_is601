@@ -133,3 +133,11 @@ def test_load_history_file_not_found(calculator):
     # This should not raise an error, just log and return
     calculator.load_history()
     assert len(calculator.history) == 0
+
+@patch('app.calculator.logging.basicConfig', side_effect=Exception("Logging setup failed"))
+def test_setup_logging_failure(mock_logging, capsys):
+    """Cover the except block in _setup_logging when logging fails."""
+    # The code catches the exception and prints a message
+    calc = Calculator()
+    captured = capsys.readouterr()
+    assert "Could not load existing history" in captured.out or "Logging setup failed" in captured.out

@@ -184,3 +184,8 @@ def test_repr_representation():
         f"timestamp='{calc.timestamp.isoformat()}')"
     )
     assert result_repr == expected_repr
+
+def test_calculation_invalid_operation():
+    """Cover the ValidationError -> OperationError branch in Calculation."""
+    with pytest.raises(OperationError):
+        Calculation(operation="InvalidOperationName", operand1=Decimal("1"), operand2=Decimal("2"))
