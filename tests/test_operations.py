@@ -283,3 +283,14 @@ def test_percent_zero_division():
     with pytest.raises(ValidationError, match="Percent calculation cannot divide by zero"):
         op.execute(Decimal("50"), Decimal("0"))
 
+def test_root_negative_index():
+    """Cover the branch in Root for negative indices."""
+    op = Root()
+    with pytest.raises(ValidationError, match="Root index cannot be negative"):
+        op.execute(Decimal("8"), Decimal("-2"))
+
+def test_root_even_root_of_negative():
+    """Cover the branch in Root that prevents even roots of negative numbers."""
+    op = Root()
+    with pytest.raises(ValidationError, match="Invalid root operation"):
+        op.execute(Decimal("-4"), Decimal("2"))  # Square root of -4
