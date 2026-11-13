@@ -146,3 +146,31 @@ def test_repl_generic_exception_in_loop(mock_perform, mock_input, capsys):
     calculator_repl()
     captured = capsys.readouterr()
     assert "Unexpected error" in captured.out
+
+@patch('builtins.input', side_effect=['unknown_command_xyz', 'exit'])
+def test_repl_unknown_command(mock_input, capsys):
+    """Cover the 'Unknown command' print branch."""
+    calculator_repl()
+    captured = capsys.readouterr()
+    assert "Unknown command" in captured.out
+
+@patch('builtins.input', side_effect=KeyboardInterrupt)
+def test_repl_keyboard_interrupt(mock_input, capsys):
+    """Cover the KeyboardInterrupt except block."""
+    calculator_repl()
+    captured = capsys.readouterr()
+    assert "Operation cancelled" in captured.out
+
+@patch('builtins.input', side_effect=EOFError)
+def test_repl_eof_error(mock_input, capsys):
+    """Cover the EOFError except block."""
+    calculator_repl()
+    captured = capsys.readouterr()
+    assert "Input terminated" in captured.out
+
+@patch('builtins.input', side_effect=Exception("Random system error"))
+def test_repl_generic_exception(mock_input, capsys):
+    """Cover the generic Exception except block."""
+    calculator_repl()
+    captured = capsys.readouterr()
+    assert "Error" in captured.out
