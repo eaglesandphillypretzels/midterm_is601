@@ -312,3 +312,15 @@ def test_absolute_difference_execution():
     op = AbsoluteDifference()
     result = op.execute(Decimal("5"), Decimal("10"))
     assert result == Decimal("5")
+
+def test_modulus_negative_divisor_final():
+    """Cover lines 71-75: Modulus validation for negative divisors."""
+    op = Modulus()
+    with pytest.raises(ValidationError, match="Cannot perform modulus operation with a negative divisor"):
+        op.execute(Decimal("5"), Decimal("-2"))
+
+def test_percent_zero_division_final():
+    """Cover line 102: Percent validation for division by zero."""
+    op = Percent()
+    with pytest.raises(ValidationError, match="Percent calculation cannot divide by zero"):
+        op.execute(Decimal("50"), Decimal("0"))

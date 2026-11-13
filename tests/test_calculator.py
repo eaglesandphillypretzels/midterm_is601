@@ -153,3 +153,31 @@ def test_add_and_remove_observer(calculator):
     # Remove observer
     calculator.remove_observer(observer)
     assert observer not in calculator.observers
+
+def test_remove_observer(calculator):
+    """Cover line 68: remove_observer logging."""
+    obs = LoggingObserver()
+    calculator.add_observer(obs)
+    calculator.remove_observer(obs)
+    assert obs not in calculator.observers
+
+def test_save_empty_history(calculator):
+    """Cover line 121: logging.info('Empty history saved')."""
+    calculator.clear_history()
+    calculator.save_history()
+    assert calculator.config.history_file.exists()
+
+def test_calculation_invalid_operation_name():
+    """Cover the first except block when OperationFactory fails."""
+    with pytest.raises(OperationError):
+        Calculation(operation="FakeOperation", operand1=Decimal("1"), operand2=Decimal("2"))
+
+def test_calculation_division_by_zero():
+    """Cover the second except block when operation.execute fails."""
+    with pytest.raises(OperationError):
+        Calculation(operation="Division", operand1=Decimal("1"), operand2=Decimal("0"))
+
+def test_calculation_root_zero_degree():
+    """Cover the Root zero-degree branch."""
+    with pytest.raises(OperationError):
+        Calculation(operation="Root", operand1=Decimal("16"), operand2=Decimal("0"))
