@@ -87,3 +87,23 @@ def test_repl_ctrl_d_eof(mock_input, capsys):
     calculator_repl()
     captured = capsys.readouterr()
     assert "Input terminated" in captured.out
+
+@patch('app.calculator_repl.Calculator')
+def test_repl_fatal_initialization_error(mock_calculator_class, capsys):
+    """Cover the fatal error block at the end of calculator_repl."""
+    # Make the Calculator initialization fail
+    mock_calculator_class.side_effect = Exception("Fatal init error")
+    
+    with pytest.raises(Exception, match="Fatal init error"):
+        calculator_repl()
+    
+    captured = capsys.readouterr()
+    assert "Fatal error" in captured.out
+
+@patch('builtins.input', side_effect=['add', '1', '1', 'exit'])
+@patch('app.calculator_repl.Calculator.perform_operation', side_effect=Exception("Unexpected REPL error"))
+def test_repl_unexpected_exception_in_loop(mock_perform, mock_input, capsys):
+    """Cover the generic except Exception block inside the REPL while loop."""
+    calculator_repl()
+    captured = capsys.readouterr()
+    assert "Unexpected error" in captured.out or "Error" in captured.out
