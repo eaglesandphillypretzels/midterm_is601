@@ -39,7 +39,7 @@ class Division(Operation):
 
         super().validate_operands(a, b)
         if b == 0:
-            raise ValidationError("Cannot divide by zero")
+            raise ValidationError("Division by zero is not allowed")
         
     def execute(self, a: Decimal, b: Decimal) -> Decimal:
         """Divide one number by another."""
@@ -49,7 +49,7 @@ class Power(Operation):
     def validate_operands(self, a: Decimal, b: Decimal) -> None:
         super().validate_operands(a, b)
         if b < 0:
-            raise ValidationError("Negative exponent is not allowed for this operation")
+            raise ValidationError("Negative exponents are not allowed for this operation")
         
     def execute(self, a: Decimal, b: Decimal) -> Decimal:
         """Raise a number to the power of another number."""
@@ -61,7 +61,7 @@ class Root(Operation):
         if a < 0:
             raise ValidationError("Invalid root operation")
         if b == 0:
-            raise ValidationError("Division by zero is not allowed")
+            raise ValidationError("Cannot divide by zero")
 
     def execute(self, a: Decimal, b: Decimal) -> Decimal:
         """Find the nth root of a number."""
@@ -71,9 +71,9 @@ class Modulus(Operation):
     def validate_operands(self, a: Decimal, b: Decimal) -> None:
         super().validate_operands(a, b)
         if b == 0:
-            raise ValidationError("Cannot perform modulus operation with a divisor of zero.")
+            raise ValidationError("Modulus by zero is not allowed.")
         if b < 0:
-            raise ValidationError("Cannot perform modulus operation with a negative divisor.")
+            raise ValidationError("Modulus by zero is not allowed.")
 
     def execute(self, a: Decimal, b: Decimal) -> Decimal:
         """Return the remainder after dividing one number by another."""
@@ -99,7 +99,7 @@ class AbsoluteDifference(Operation):
         return abs(a - b)
 class OperationFactory:
     """Create operation instances by the names used in the calculator."""
-    operations = {
+operations = {
         # Addition
         "Addition": Addition, "addition": Addition, "Add": Addition, "add": Addition, "+": Addition,
         # Subtraction
@@ -117,11 +117,9 @@ class OperationFactory:
         # Percent
         "Percent": Percent, "percent": Percent,
         # Absolute Difference
-        "Absolute Difference": AbsoluteDifference, "AbsoluteDifference": AbsoluteDifference,
+        "Absolute Difference": AbsoluteDifference, "AbsoluteDifference": AbsoluteDifference, 
         "absolute difference": AbsoluteDifference, "absolutedifference": AbsoluteDifference, "absdiff": AbsoluteDifference
     }
-    # Backward-compatible internal registry used by factory methods.
-    _operations = operations
 
     @classmethod
     def create(cls, name: str) -> Operation:
@@ -133,7 +131,7 @@ class OperationFactory:
             title_case_name = normalized_name.title()
             operation_class = cls._operations.get(title_case_name)
         if operation_class is None:
-            raise ValidationError(f"Unknown operation: {name}")
+            raise ValidationError(f"Unsupported operation")
         return operation_class()
 
     @classmethod
