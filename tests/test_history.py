@@ -23,7 +23,7 @@ def calculation_mock():
 
 def test_history_observer_is_abstract():
     with pytest.raises(TypeError):
-        HistoryObserver()
+        HistoryObserver()  # type: ignore[reportAbstractUsage]
 
 
 def test_concrete_history_observer_can_be_instantiated():
@@ -44,7 +44,7 @@ def test_logging_observer_logs_calculation(logging_info_mock, calculation_mock):
 def test_logging_observer_no_calculation():
     observer = LoggingObserver()
     with pytest.raises(AttributeError):
-        observer.update(None)
+        observer.update(None)  # type: ignore[arg-type]
 
 
 @patch("logging.info")
@@ -93,7 +93,7 @@ def test_autosave_observer_no_calculation():
 
     observer = AutoSaveObserver(calculator_mock_obj)
     with pytest.raises(AttributeError):
-        observer.update(None)
+        observer.update(None)  # type: ignore[arg-type]
 
 
 def test_autosave_observer_invalid_calculator_missing_attributes():

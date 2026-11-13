@@ -4,13 +4,6 @@ from typing import Any
 from app.calculation import Calculation
 
 class HistoryObserver(ABC):
-    """
-    Abstract base class for calculator observers.
-
-    This class defines the interface for observers that monitor and react to
-    new calculation events. Implementing classes must provide an update method
-    to handle the received Calculation instance.
-    """
 
     @abstractmethod
     def update(self, calculation: Calculation) -> None:
@@ -22,14 +15,8 @@ class HistoryObserver(ABC):
         """
         pass  # pragma: no cover
 
-
 class LoggingObserver(HistoryObserver):
-    """
-    Observer that logs calculations to a file.
-
-    Implements the Observer pattern by listening for new calculations and logging
-    their details to a log file.
-    """
+    
 
     def update(self, calculation: Calculation) -> None:
         """
