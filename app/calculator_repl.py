@@ -6,7 +6,7 @@ from app.exceptions import OperationError, ValidationError
 from app.history import AutoSaveObserver, LoggingObserver
 from app.operations import OperationFactory
 
-def calculator_repl()
+def calculator_repl():
     try:
         # Initialize the Calculator instance
         calc = Calculator()
@@ -110,7 +110,7 @@ def calculator_repl()
                             continue
 
                         # Create the appropriate operation instance using the Factory pattern
-                        operation = OperationFactory.create_operation(command)
+                        operation = OperationFactory().create_operation(command)
                         calc.set_operation(operation)
 
                         # Perform the calculation
