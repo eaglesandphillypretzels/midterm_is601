@@ -1,224 +1,86 @@
 import pytest
-from unittest.mock import patch, MagicMock
-from decimal import Decimal
+from unittest.mock import patch
 from app.calculator_repl import calculator_repl
-from app.exceptions import OperationError, ValidationError
+from app.calculator import Calculator
 
-# Testing Simple Commands
-
+# --- Simple Commands ---
 @pytest.mark.parametrize("command,expected_output", [
     ("help", "Available commands:"),
     ("clear", "History cleared"),
     ("history", "No calculations in history"),
 ])
 def test_simple_commands(command, expected_output, capsys):
-    """Test simple commands that don't require additional input"""
     with patch('builtins.input', side_effect=[command, 'exit']):
         calculator_repl()
-    
-    captured = capsys.readouterr()
-    assert expected_output in captured.out
+    assert expected_output in capsys.readouterr().out
 
-# Testing Exit Command Variations
-
+# --- Exit & Save Variations ---
 @pytest.mark.parametrize("save_side_effect,expected_output", [
     (None, "History saved successfully"),
     (Exception("Save failed"), "Warning: Could not save history"),
 ])
 def test_exit_command(save_side_effect, expected_output, capsys):
-    """Test exit command with different save outcomes"""
     with patch('app.calculator.Calculator.save_history', side_effect=save_side_effect):
         with patch('builtins.input', return_value='exit'):
             calculator_repl()
-    
-    captured = capsys.readouterr()
-    assert expected_output in captured.out
+    assert expected_output in capsys.readouterr().out
 
-@patch('builtins.input', side_effect=['help', 'history', 'add', '5', '3', 'history', 'undo', 'redo', 'clear', 'save', 'exit'])
+# --- Full Loop & Math ---
+@patch('builtins.input', side_effect=['add', '5', '3', 'history', 'undo', 'redo', 'clear', 'save', 'load', 'exit'])
 def test_repl_full_loop(mock_input, capsys):
     calculator_repl()
-    captured = capsys.readouterr()
-    assert "Available commands" in captured.out
-    assert "No calculations in history" in captured.out
-    assert "Result: 8" in captured.out
-    assert "Operation undone" in captured.out
-    assert "Operation redone" in captured.out
-    assert "History cleared" in captured.out
-    assert "Goodbye" in captured.out
+    out = capsys.readouterr().out
+    assert "Result: 8" in out
+    assert "1. Addition" in out  # Covers populated history
+    assert "Operation undone" in out
+    assert "Operation redone" in out
+    assert "History cleared" in out
+    assert "History saved successfully" in out
+    assert "History loaded successfully" in out
 
+# --- Cancellation Paths ---
 @patch('builtins.input', side_effect=['add', 'cancel', 'exit'])
-def test_repl_cancel_operation(mock_input, capsys):
+def test_repl_cancel_first_number(mock_input, capsys):
     calculator_repl()
-    captured = capsys.readouterr()
-    assert "Operation cancelled" in captured.out
-
-@patch('builtins.input', side_effect=['unknown_cmd', 'exit'])
-def test_repl_unknown_command(mock_input, capsys):
-    calculator_repl()
-    captured = capsys.readouterr()
-    assert "Unknown command" in captured.out
-
-@patch('builtins.input', side_effect=[KeyboardInterrupt, 'exit'])
-def test_repl_keyboard_interrupt(mock_input, capsys):
-    calculator_repl()
-    captured = capsys.readouterr()
-    assert "Operation cancelled" in captured.out
-
-@patch('builtins.input', side_effect=EOFError)
-def test_repl_eof_error(mock_input, capsys):
-    calculator_repl()
-    captured = capsys.readouterr()
-    assert "Input terminated" in captured.out
-
-@patch('builtins.input', side_effect=['load', 'exit'])
-def test_repl_load_command(mock_input, capsys):
-    calculator_repl()
-    captured = capsys.readouterr()
-    assert "History loaded successfully" in captured.out or "Error loading history" in captured.out
-
-@patch('builtins.input', side_effect=[KeyboardInterrupt, 'exit'])
-def test_repl_ctrl_c_interrupt(mock_input, capsys):
-    calculator_repl()
-    captured = capsys.readouterr()
-    assert "Operation cancelled" in captured.out
-
-@patch('builtins.input', side_effect=EOFError)
-def test_repl_ctrl_d_eof(mock_input, capsys):
-    calculator_repl()
-    captured = capsys.readouterr()
-    assert "Input terminated" in captured.out
-
-@patch('app.calculator_repl.Calculator')
-def test_repl_fatal_initialization_error(mock_calculator_class, capsys):
-    """Cover the fatal error block at the end of calculator_repl."""
-    # Make the Calculator initialization fail
-    mock_calculator_class.side_effect = Exception("Fatal init error")
-    
-    with pytest.raises(Exception, match="Fatal init error"):
-        calculator_repl()
-    
-    captured = capsys.readouterr()
-    assert "Fatal error" in captured.out
-
-@patch('builtins.input', side_effect=['add', '1', '1', 'exit'])
-@patch('app.calculator_repl.Calculator.perform_operation', side_effect=Exception("Unexpected REPL error"))
-def test_repl_unexpected_exception_in_loop(mock_perform, mock_input, capsys):
-    """Cover the generic except Exception block inside the REPL while loop."""
-    calculator_repl()
-    captured = capsys.readouterr()
-    assert "Unexpected error" in captured.out or "Error" in captured.out
-
-@patch('builtins.input', side_effect=['unknown_command_xyz', 'exit'])
-def test_repl_unknown_command(mock_input, capsys):
-    """Cover the 'Unknown command' print branch."""
-    calculator_repl()
-    captured = capsys.readouterr()
-    assert "Unknown command" in captured.out
-
-@patch('builtins.input', side_effect=KeyboardInterrupt)
-def test_repl_keyboard_interrupt(mock_input, capsys):
-    """Cover the KeyboardInterrupt except block."""
-    calculator_repl()
-    captured = capsys.readouterr()
-    assert "Operation cancelled" in captured.out
-
-@patch('builtins.input', side_effect=EOFError)
-def test_repl_eof_error(mock_input, capsys):
-    """Cover the EOFError except block."""
-    calculator_repl()
-    captured = capsys.readouterr()
-    assert "Input terminated" in captured.out
-
-@patch('builtins.input', side_effect=Exception("Random system error"))
-def test_repl_generic_exception(mock_input, capsys):
-    """Cover the generic Exception except block."""
-    calculator_repl()
-    captured = capsys.readouterr()
-    assert "Error" in captured.out
-
-@patch('builtins.input', side_effect=['unknown_command_xyz', 'exit'])
-def test_repl_unknown_command(mock_input, capsys):
-    """Cover the 'Unknown command' print branch."""
-    calculator_repl()
-    captured = capsys.readouterr()
-    assert "Unknown command" in captured.out
-
-@patch('builtins.input', side_effect=[KeyboardInterrupt, EOFError])
-def test_repl_keyboard_interrupt(mock_input, capsys):
-    """Cover the KeyboardInterrupt except block."""
-    # First call raises KeyboardInterrupt (loop continues), second raises EOFError (loop breaks)
-    calculator_repl()
-    captured = capsys.readouterr()
-    assert "Operation cancelled" in captured.out
-
-@patch('builtins.input', side_effect=[EOFError])
-def test_repl_eof_error(mock_input, capsys):
-    """Cover the EOFError except block."""
-    # EOFError triggers the 'break' statement in the REPL, safely ending the test
-    calculator_repl()
-    captured = capsys.readouterr()
-    assert "Input terminated" in captured.out
-
-@patch('builtins.input', side_effect=[Exception("Random system error"), EOFError])
-def test_repl_generic_exception(mock_input, capsys):
-    """Cover the generic Exception except block."""
-    # First call raises generic Exception (loop continues), second raises EOFError (loop breaks)
-    calculator_repl()
-    captured = capsys.readouterr()
-    assert "Error" in captured.out
+    assert "Operation cancelled" in capsys.readouterr().out
 
 @patch('builtins.input', side_effect=['add', '5', 'cancel', 'exit'])
 def test_repl_cancel_second_number(mock_input, capsys):
-    """Cover line 127: if b.lower() == 'cancel':"""
     calculator_repl()
     assert "Operation cancelled" in capsys.readouterr().out
 
-@patch('builtins.input', side_effect=['save', 'load', 'clear', 'exit'])
-def test_repl_save_load_clear_commands(mock_input, capsys):
-    """Cover lines 79, 87-88, 96-97."""
+# --- Error Handling in REPL ---
+@patch('builtins.input', side_effect=['unknown_cmd_xyz', 'exit'])
+def test_repl_unknown_command(mock_input, capsys):
     calculator_repl()
-    out = capsys.readouterr().out
-    assert "History saved successfully" in out
-    assert "History loaded successfully" in out
-    assert "History cleared" in out
+    assert "Unknown command" in capsys.readouterr().out
 
+@patch('builtins.input', side_effect=['add', '1', '1', 'exit'])
+@patch('app.calculator.Calculator.perform_operation', side_effect=Exception("Unexpected REPL error"))
+def test_repl_unexpected_exception_in_loop(mock_perform, mock_input, capsys):
+    calculator_repl()
+    assert "Unexpected error" in capsys.readouterr().out or "Error" in capsys.readouterr().out
+
+# --- System Interrupts (Safe versions that don't infinite loop) ---
 @patch('builtins.input', side_effect=[KeyboardInterrupt, 'exit'])
-def test_repl_keyboard_interrupt_final(mock_input, capsys):
-    """Cover lines 157-159: except KeyboardInterrupt block."""
-    calculator_repl()
-
-@patch('builtins.input', side_effect=['add', '5', '3', 'history', 'exit'])
-def test_repl_history_with_data(mock_input, capsys):
-    """Cover line 71: history display when NOT empty."""
-    calculator_repl()
-    assert "1. Addition" in capsys.readouterr().out
-
-@patch('builtins.input', side_effect=['clear', 'exit'])
-def test_repl_clear(mock_input, capsys):
-    """Cover line 79: clear command."""
-    calculator_repl()
-    assert "History cleared" in capsys.readouterr().out
-
-@patch('builtins.input', side_effect=['save', 'exit'])
-def test_repl_save(mock_input, capsys):
-    """Cover lines 87-88: save command."""
-    calculator_repl()
-    assert "History saved successfully" in capsys.readouterr().out
-
-@patch('builtins.input', side_effect=['load', 'exit'])
-def test_repl_load(mock_input, capsys):
-    """Cover lines 96-97: load command."""
-    calculator_repl()
-    assert "History loaded successfully" in capsys.readouterr().out
-
-@patch('builtins.input', side_effect=['add', '1', 'cancel', 'exit'])
-def test_repl_cancel_b(mock_input, capsys):
-    """Cover line 127: canceling the second number."""
+def test_repl_keyboard_interrupt(mock_input, capsys):
     calculator_repl()
     assert "Operation cancelled" in capsys.readouterr().out
 
-@patch('builtins.input', side_effect=[KeyboardInterrupt, 'exit'])
-def test_repl_ctrl_c(mock_input, capsys):
-    """Cover lines 157-159: KeyboardInterrupt block."""
+@patch('builtins.input', side_effect=[EOFError])
+def test_repl_eof_error(mock_input, capsys):
     calculator_repl()
-    assert "Operation cancelled" in capsys.readouterr().out
+    assert "Input terminated" in capsys.readouterr().out
+
+@patch('builtins.input', side_effect=[Exception("Random system error"), 'exit'])
+def test_repl_generic_exception(mock_input, capsys):
+    calculator_repl()
+    assert "Error" in capsys.readouterr().out
+
+# --- Fatal Initialization ---
+@patch('app.calculator_repl.Calculator')
+def test_repl_fatal_initialization_error(mock_calculator_class, capsys):
+    mock_calculator_class.side_effect = Exception("Fatal init error")
+    with pytest.raises(Exception, match="Fatal init error"):
+        calculator_repl()
+    assert "Fatal error" in capsys.readouterr().out
