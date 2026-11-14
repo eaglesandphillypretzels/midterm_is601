@@ -5,10 +5,14 @@ This program is a calculator with a comprehensive range of available features, i
 
 | Operation | Formula | Description         |
 |-----------|---------|---------------------|
-|`addition` | `a + b` | Adding two numbers together |
-| `subtraction` | `a - b`  | Subtracting two numbers from each other |
-|`multiplication` | `a * b` | Multiplying two numbers from each other |
-| `division` | `a / b`  | Dividing two numbers from each other |
+|`addition` | `a + b` | Adds two numbers together |
+| `subtraction` | `a - b`  | Subtracts two numbers from each other |
+| `multiplication` | `a * b` `a x b` | Multiplies two numbers from each other |
+| `division` | `a / b`  | Divides two numbers from each other |
+| `power` | `a ^ b` `a ** b` | Raises a number to the power of another number |
+| `root` | `a ^ 1 / b` | Finds the nth root of a number |
+| `percent` | `(a / b) * 100` | Returns the percentage of one number relative to another |
+| `absolute difference` | `abs(a - b)` | Returns the absolute value of the difference between two numbers |
 
 
 ## How to Use Program
