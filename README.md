@@ -1,7 +1,7 @@
 # IS601 Midterm: Python Calculator
 This program is a calculator with a comprehensive range of available features, including advanced operations, undo, redo, and history. The history stores up to 200 solved equations, saved live after entering an equation.
 
-## Features
+## Calculation Features
 
 | Operation | Formula | Description         |
 |-----------|---------|---------------------|
