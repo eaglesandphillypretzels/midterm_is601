@@ -1,4 +1,4 @@
-from decimal import Decimal
+from decimal import Decimal, ROUND_HALF_UP
 import logging
 
 from app.calculator import Calculator
@@ -94,9 +94,9 @@ def calculator_repl():
                         print(f"Error loading history: {e}")
                     continue
 
-                                # Dynamically fetch all valid operation names from the factory
+                # Dynamically fetch all valid operation names from the factory
                 valid_commands = [k.lower() for k in OperationFactory.get_available_operations().keys()]
-                
+
                 if command in valid_commands:
                     # Perform the specified arithmetic operation
                     try:
@@ -117,11 +117,16 @@ def calculator_repl():
                         # Perform the calculation
                         result = calc.perform_operation(a, b)
 
-                        # Normalize the result if it's a Decimal
+                        # Format the result to up to 2 decimal places without scientific notation
                         if isinstance(result, Decimal):
-                            result = result.normalize()
+                            result = result.quantize(Decimal('0.1'), rounding=ROUND_HALF_UP)
+                            result_str = format(result, 'f')
+                            if '.' in result_str:
+                                result_str = result_str.rstrip('0').rstrip('.')
+                            print(f"\nResult: {result_str}")
+                        else:
+                            print(f"\nResult: {result}")
 
-                        print(f"\nResult: {result}")
                     except (ValidationError, OperationError) as e:
                         # Handle known exceptions related to validation or operation errors
                         print(f"Error: {e}")
