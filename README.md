@@ -1,8 +1,15 @@
 # IS601 Midterm: Python Calculator
-This program is a calculator with a comprehensive range of available features, including advanced operations, undo, redo, and history. The history stores up to 200 solved equations, with live time-stamping after entering an equation.
+This program is a calculator with a comprehensive range of available features, including advanced operations, undo, redo, and history. The history stores up to 200 solved equations, saved live after entering an equation.
 
 ## Features
-[add]
+
+| Operation | Formula | Description         |
+|-----------|---------|---------------------|
+|`addition` | `a + b` | Adding two numbers together |
+| `subtraction` | `a - b`  | Subtracting two numbers from each other |
+|`multiplication` | `a * b` | Multiplying two numbers from each other |
+| `division` | `a / b`  | Dividing two numbers from each other |
+
 
 ## How to Use Program
 # 🧩 1. Install Homebrew (Mac Only)

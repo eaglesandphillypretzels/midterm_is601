@@ -68,14 +68,6 @@ class Root(Operation):
     def execute(self, a: Decimal, b: Decimal) -> Decimal:
         """Find the nth root of a number."""
         self.validate_operands(a, b)
-        # Handle negative radicand for odd roots (e.g., cube root of -8 is -2)
-        if a < 0:
-            return -Decimal(str(pow(float(-a), 1 / float(b))))
-        return Decimal(str(pow(float(a), 1 / float(b))))
-
-    def execute(self, a: Decimal, b: Decimal) -> Decimal:
-        """Find the nth root of a number."""
-        self.validate_operands(a, b)
         return Decimal(pow(float(a), 1 / float(b)))
 class Modulus(Operation):
     def validate_operands(self, a: Decimal, b: Decimal) -> None:
