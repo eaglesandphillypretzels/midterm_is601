@@ -194,3 +194,13 @@ def test_calculation_div_zero():
     """Cover lines 35-41: operation.execute fails."""
     with pytest.raises(OperationError):
         Calculation(operation="Division", operand1=Decimal("1"), operand2=Decimal("0"))
+
+def test_calculation_invalid_op_name():
+    """Hits line 29-31: OperationFactory.create raises ValidationError"""
+    with pytest.raises(OperationError, match="Unsupported operation"):
+        Calculation(operation="FakeOp", operand1=Decimal("1"), operand2=Decimal("2"))
+
+def test_calculation_arithmetic_error():
+    """Hits line 38-41: Catches ArithmeticError/OverflowError"""
+    with pytest.raises(OperationError, match="Calculation failed"):
+        Calculation(operation="Power", operand1=Decimal("10"), operand2=Decimal("1000"))

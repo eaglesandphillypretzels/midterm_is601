@@ -111,7 +111,7 @@ def calculator_repl():
                             continue
 
                         # Create the appropriate operation instance using the Factory pattern
-                        operation = OperationFactory().create(command)
+                        operation = OperationFactory.create(command)
                         calc.set_operation(operation)
 
                         # Perform the calculation
@@ -151,10 +151,4 @@ def calculator_repl():
         print(f"Fatal error: {e}")
         logging.error(f"Fatal error in calculator REPL: {e}")
         raise
-
-@patch('builtins.input', side_effect=['5 + 3', 'history', 'undo', 'quit'])
-def test_repl_full_loop(mock_input, capsys):
-    calculator_repl()
-    captured = capsys.readouterr()
-    assert "8" in captured.out
 
