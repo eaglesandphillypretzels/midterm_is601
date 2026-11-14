@@ -167,14 +167,6 @@ def test_repl_generic_exception(mock_input, capsys):
     captured = capsys.readouterr()
     assert "Error" in captured.out
 
-@patch('builtins.input', side_effect=['add', '5', '3', 'history', 'exit'])
-def test_repl_math_and_history_with_data(mock_input, capsys):
-    """Cover line 71: history = calc.show_history() when history is NOT empty."""
-    calculator_repl()
-    out = capsys.readouterr().out
-    assert "Result: 8" in out
-    assert "1. Addition" in out
-
 @patch('builtins.input', side_effect=['add', '5', 'cancel', 'exit'])
 def test_repl_cancel_second_number(mock_input, capsys):
     """Cover line 127: if b.lower() == 'cancel':"""
@@ -194,42 +186,6 @@ def test_repl_save_load_clear_commands(mock_input, capsys):
 def test_repl_keyboard_interrupt_final(mock_input, capsys):
     """Cover lines 157-159: except KeyboardInterrupt block."""
     calculator_repl()
-
-@patch('builtins.input', side_effect=['add', '5', '3', 'history', 'exit'])
-def test_repl_history_with_data(mock_input, capsys):
-    """Cover line 71: history display when NOT empty."""
-    calculator_repl()
-    assert "1. Addition" in capsys.readouterr().out
-
-@patch('builtins.input', side_effect=['clear', 'exit'])
-def test_repl_clear(mock_input, capsys):
-    """Cover line 79: clear command."""
-    calculator_repl()
-    assert "History cleared" in capsys.readouterr().out
-
-@patch('builtins.input', side_effect=['save', 'exit'])
-def test_repl_save(mock_input, capsys):
-    """Cover lines 87-88: save command."""
-    calculator_repl()
-    assert "History saved successfully" in capsys.readouterr().out
-
-@patch('builtins.input', side_effect=['load', 'exit'])
-def test_repl_load(mock_input, capsys):
-    """Cover lines 96-97: load command."""
-    calculator_repl()
-    assert "History loaded successfully" in capsys.readouterr().out
-
-@patch('builtins.input', side_effect=['add', '1', 'cancel', 'exit'])
-def test_repl_cancel_b(mock_input, capsys):
-    """Cover line 127: canceling the second number."""
-    calculator_repl()
-    assert "Operation cancelled" in capsys.readouterr().out
-
-@patch('builtins.input', side_effect=[KeyboardInterrupt, 'exit'])
-def test_repl_ctrl_c(mock_input, capsys):
-    """Cover lines 157-159: KeyboardInterrupt block."""
-    calculator_repl()
-    assert "Operation cancelled" in capsys.readouterr().out
 
 @patch('builtins.input', side_effect=['add', '5', '3', 'history', 'exit'])
 def test_repl_history_with_data(mock_input, capsys):

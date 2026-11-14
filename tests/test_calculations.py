@@ -185,20 +185,6 @@ def test_repr_representation():
     )
     assert result_repr == expected_repr
 
-def test_calculation_invalid_operation():
-    """Cover the ValidationError -> OperationError branch in Calculation."""
-    with pytest.raises(OperationError):
-        Calculation(operation="InvalidOperationName", operand1=Decimal("1"), operand2=Decimal("2"))
-
-def test_calculation_invalid_operation_name():
-    """Cover the first except block when OperationFactory fails."""
-    with pytest.raises(OperationError):
-        Calculation(operation="FakeOperation", operand1=Decimal("1"), operand2=Decimal("2"))
-
-def test_calculation_division_by_zero():
-    """Cover the second except block when operation.execute fails."""
-    with pytest.raises(OperationError):
-        Calculation(operation="Division", operand1=Decimal("1"), operand2=Decimal("0"))
 def test_calculation_invalid_op():
     """Cover lines 29-31: OperationFactory fails."""
     with pytest.raises(OperationError):
