@@ -90,7 +90,7 @@ class Percent(Operation):
     def execute(self, a: Decimal, b: Decimal) -> Decimal:
         """Return the percentage of one number relative to another."""
         self.validate_operands(a, b)
-        return (a / b) * Decimal(100)
+        return (a / b) * Decimal('100')
 class AbsoluteDifference(Operation):
     def validate_operands(self, a: Decimal, b: Decimal) -> None:
         super().validate_operands(a, b)
@@ -130,4 +130,4 @@ OperationFactory.register(Power, "^", "**")
 OperationFactory.register(Root)
 OperationFactory.register(Modulus, "modulo", "%")
 OperationFactory.register(Percent)
-OperationFactory.register(AbsoluteDifference, "absolute difference", "absdiff")
+OperationFactory.register(AbsoluteDifference, "absolute difference", "absdiff", "absdif")

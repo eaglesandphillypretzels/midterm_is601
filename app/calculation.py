@@ -92,10 +92,15 @@ class Calculation:
 
     def format_result(self, precision: int = 2) -> str:
         try:
-            return str(self.result.normalize().quantize(
-                Decimal("0." + "0" * precision)
-            ).normalize())
-        except InvalidOperation: # pragma: no cover
+            # 1. Quantize to the specified precision
+            q = self.result.quantize(Decimal("0." + "0" * precision), rounding=ROUND_HALF_UP)
+            # 2. Format as fixed-point string to prevent scientific notation
+            s = format(q, 'f')
+            # 3. Strip trailing zeros and decimal point if not needed
+            if '.' in s:
+                s = s.rstrip('0').rstrip('.')
+            return s
+        except InvalidOperation:  # pragma: no cover
             return str(self.result)
 
     def __str__(self) -> str:

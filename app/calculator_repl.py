@@ -119,7 +119,7 @@ def calculator_repl():
 
                         # Format the result to up to 2 decimal places without scientific notation
                         if isinstance(result, Decimal):
-                            result = result.quantize(Decimal('0.1'), rounding=ROUND_HALF_UP)
+                            result = result.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
                             result_str = format(result, 'f')
                             if '.' in result_str:
                                 result_str = result_str.rstrip('0').rstrip('.')

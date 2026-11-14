@@ -183,6 +183,26 @@ class TestRoot(BaseOperationTest):
         },
     }
 
+class TestPercent(BaseOperationTest):
+    """Test Percent operation."""
+
+    operation_class = Percent
+
+    valid_test_cases = {
+        "basic_percent": {"a": "25", "b": "100", "expected": "25"},
+        "over_100_percent": {"a": "150", "b": "100", "expected": "150"},
+        "decimal_inputs": {"a": "0.5", "b": "2", "expected": "25"},
+        "zero_numerator": {"a": "0", "b": "50", "expected": "0"},
+    }
+
+    invalid_test_cases = {
+        "divide_by_zero": {
+            "a": "5",
+            "b": "0",
+            "error": ValidationError,
+            "message": "Percent calculation cannot divide by zero."
+        },
+    }
 
 class TestModulus(BaseOperationTest):
     """Test Modulus operation."""
