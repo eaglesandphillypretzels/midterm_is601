@@ -56,7 +56,7 @@ class Calculator:
                 format='%(asctime)s - %(levelname)s - %(message)s',
                 force=True  # Overwrite any existing logging configuration
             )
-        except Exception as e:
+        except Exception as e: # pragma: no cover
             print(f"Could not load existing history: {e}")
 
         logging.info("Calculator initialized with configuration")

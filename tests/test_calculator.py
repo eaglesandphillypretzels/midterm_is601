@@ -155,19 +155,6 @@ def test_add_and_remove_observer(calculator):
     calculator.remove_observer(observer)
     assert observer not in calculator.observers
 
-def test_remove_observer(calculator):
-    """Cover line 68: remove_observer logging."""
-    obs = LoggingObserver()
-    calculator.add_observer(obs)
-    calculator.remove_observer(obs)
-    assert obs not in calculator.observers
-
-def test_save_empty_history(calculator):
-    """Cover line 121: logging.info('Empty history saved')."""
-    calculator.clear_history()
-    calculator.save_history()
-    assert calculator.config.history_file.exists()
-
 def test_calculation_invalid_operation_name():
     """Cover the first except block when OperationFactory fails."""
     with pytest.raises(OperationError):
@@ -195,3 +182,18 @@ def test_save_empty_history(calculator):
     calculator.clear_history()
     calculator.save_history()
     assert calculator.config.history_file.exists()
+
+def test_history_truncation_exceeds_max_size():
+    # Force a tiny max history size for testing
+    config = CalculatorConfig(max_history_size=2)
+    calc = Calculator(config=config)
+    calc.set_operation(Addition())
+    
+    # Perform 3 operations (exceeds the limit of 2)
+    calc.perform_operation(1, 1)
+    calc.perform_operation(2, 2)
+    calc.perform_operation(3, 3)
+    
+    # Verify the oldest entry was popped
+    assert len(calc.history) == 2
+    assert calc.history[0].operand1 == Decimal('2') # The '1+1' calculation was removed

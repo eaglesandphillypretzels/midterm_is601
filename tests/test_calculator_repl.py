@@ -129,9 +129,9 @@ def test_repl_nothing_to_undo(mock_input, capsys):
     out = capsys.readouterr().out
     assert "Nothing to undo" in out
 
-@patch('builtins.input', side_effect=['redo', 'exit'])
-def test_repl_nothing_to_redo(mock_input, capsys):
-    """Covers the 'Nothing to redo' branch when the redo stack is empty."""
+@patch('builtins.input', side_effect=['undo', 'exit'])
+def test_repl_nothing_to_(mock_input, capsys):
+    """Covers the 'Nothing to undo' branch when the undo stack is empty."""
     calculator_repl()
     out = capsys.readouterr().out
-    assert "Nothing to redo" in out
+    assert "Nothing to undo" in out

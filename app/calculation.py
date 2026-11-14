@@ -25,21 +25,6 @@ class Calculation:
     def __post_init__(self):
         self.result = self.calculate()
 
-    def _raise_div_zero(self):
-        raise ValidationError("Cannot divide by zero")
-
-    def _raise_neg_power(self):
-        raise ValidationError("Negative exponent is not allowed for this operation")
-
-    def _raise_invalid_root(self):
-        raise ValidationError("Invalid root operation")
-
-    def _raise_invalid_modulus(self):
-        raise ValidationError("Invalid modulus operation")
-
-    def _raise_invalid_percent_operation(self):
-        raise ValidationError("Percent calculation cannot divide by zero")
-
     def calculate(self) -> Decimal:
         try:
             operation = OperationFactory.create(self.operation)
