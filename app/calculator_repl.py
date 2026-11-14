@@ -26,14 +26,11 @@ def calculator_repl():
                 if command == 'help':
                     # Display available commands
                     print("\nAvailable commands:")
-                    print("  add, subtract, multiply, divide, power, root, modulus, absolute difference - Perform calculations")
-                    print("  history - Show calculation history")
-                    print("  clear - Clear calculation history")
-                    print("  undo - Undo the last calculation")
-                    print("  redo - Redo the last undone calculation")
-                    print("  save - Save calculation history to file")
-                    print("  load - Load calculation history from file")
-                    print("  exit - Exit the calculator")
+                    print("  Math: add (+), subtract (-), multiply (*), divide (/)")
+                    print("        power (^), root, modulus (modulo, %), percent")
+                    print("        absolute difference (absdiff)")
+                    print("  History: history, clear, save, load")
+                    print("  Actions: undo, redo, exit")
                     continue
 
                 if command == 'exit':
@@ -97,7 +94,10 @@ def calculator_repl():
                         print(f"Error loading history: {e}")
                     continue
 
-                if command in ['add', 'subtract', 'multiply', 'divide', 'power', 'root', 'modulus', 'absolute difference']:
+                                # Dynamically fetch all valid operation names from the factory
+                valid_commands = [k.lower() for k in OperationFactory.get_available_operations().keys()]
+                
+                if command in valid_commands:
                     # Perform the specified arithmetic operation
                     try:
                         print("\nEnter numbers (or 'cancel' to abort):")

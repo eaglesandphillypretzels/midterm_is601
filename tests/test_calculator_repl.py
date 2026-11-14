@@ -121,3 +121,10 @@ def test_repl_ctrl_c(mock_input, capsys):
     """Hits lines 157-159: KeyboardInterrupt block"""
     calculator_repl()
     assert "Operation cancelled" in capsys.readouterr().out
+
+@patch('builtins.input', side_effect=['undo', 'exit'])
+def test_repl_nothing_to_undo(mock_input, capsys):
+    """Covers the 'Nothing to undo' branch when the undo stack is empty."""
+    calculator_repl()
+    out = capsys.readouterr().out
+    assert "Nothing to undo" in out

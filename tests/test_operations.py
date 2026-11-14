@@ -217,38 +217,30 @@ class TestAbsoluteDifference(BaseOperationTest):
         "decimals": {"a": "5.5", "b": "3.3", "expected": "2.2"},
     }
     invalid_test_cases = {}
-
-
 class TestOperationFactory:
     """Test operation factory."""
 
-    def test_create_addition(self):
-        assert isinstance(OperationFactory.create("+"), Addition)
+    @pytest.mark.parametrize("name,expected_class", [
+        ("+", Addition),
+        ("-", Subtraction),
+        ("*", Multiplication),
+        ("/", Division),
+        ("^", Power),
+        ("%", Modulus),
+        ("root", Root),
+        ("absdiff", AbsoluteDifference),
+    ])
+    def test_create_by_symbol(self, name, expected_class):
+        assert isinstance(OperationFactory.create(name), expected_class)
 
-    def test_create_subtraction(self):
-        assert isinstance(OperationFactory.create("-"), Subtraction)
-
-    def test_create_multiplication(self):
-        assert isinstance(OperationFactory.create("*"), Multiplication)
-
-    def test_create_division(self):
-        assert isinstance(OperationFactory.create("/"), Division)
-
-    def test_create_power(self):
-        assert isinstance(OperationFactory.create("^"), Power)
-
-    def test_create_root(self):
-        assert isinstance(OperationFactory.create("root"), Root)
-
-    def test_create_modulus(self):
-        assert isinstance(OperationFactory.create("%"), Modulus)
-
-    def test_create_absolute_difference(self):
-        assert isinstance(OperationFactory.create("absdiff"), AbsoluteDifference)
-
-    def test_create_invalid_operation(self):
+    @pytest.mark.parametrize("name", ["invalid", "FakeOp", "", "   ", "None"])
+    def test_create_invalid_operation(self, name):
         with pytest.raises(ValidationError, match="Unsupported operation"):
-            OperationFactory.create("invalid")
+            OperationFactory.create(name)
+
+    @pytest.mark.parametrize("name", ["ADD", "Add", "  add  ", "aDd"])
+    def test_create_is_case_and_whitespace_insensitive(self, name):
+        assert isinstance(OperationFactory.create(name), Addition)
 
 def test_modulus_negative_divisor():
     op = Modulus()
@@ -324,3 +316,8 @@ def test_percent_zero():
     op = Percent()
     with pytest.raises(ValidationError):
         op.execute(Decimal("50"), Decimal("0"))
+
+@pytest.mark.parametrize("alias,expected_class",
+                        sorted(OperationFactory.get_available_operations().items()))
+def test_every_registered_alias_resolves(alias, expected_class):
+    assert isinstance(OperationFactory.create(alias), expected_class)

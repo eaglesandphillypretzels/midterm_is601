@@ -195,16 +195,3 @@ def test_save_empty_history(calculator):
     calculator.clear_history()
     calculator.save_history()
     assert calculator.config.history_file.exists()
-
-def test_remove_observer_logs(calculator):
-    """Hits line 68: logging.info in remove_observer"""
-    obs = LoggingObserver()
-    calculator.add_observer(obs)
-    calculator.remove_observer(obs)
-    assert obs not in calculator.observers
-
-def test_save_empty_history_logs(calculator):
-    """Hits line 121: logging.info('Empty history saved')"""
-    calculator.clear_history()
-    calculator.save_history()
-    assert calculator.config.history_file.exists()

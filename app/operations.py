@@ -3,7 +3,6 @@ from decimal import Decimal
 from typing import Dict
 from app.exceptions import ValidationError
 
-
 class Operation(ABC):
     """
     Abstract base class for all calculator methods, determining operations interface.
@@ -109,70 +108,21 @@ class AbsoluteDifference(Operation):
         self.validate_operands(a, b)
         return abs(a - b)
 class OperationFactory:
-    """Create operation instances by the names used in the calculator."""
+    """Create operation instances from a registry of names and aliases."""
 
-    _operations: Dict[str, type[Operation]] = {
-        # Addition
-        "Addition": Addition,
-        "addition": Addition,
-        "Add": Addition,
-        "add": Addition,
-        "+": Addition,
-        # Subtraction
-        "Subtraction": Subtraction,
-        "subtraction": Subtraction,
-        "Subtract": Subtraction,
-        "subtract": Subtraction,
-        "-": Subtraction,
-        # Multiplication
-        "Multiplication": Multiplication,
-        "multiplication": Multiplication,
-        "Multiply": Multiplication,
-        "multiply": Multiplication,
-        "*": Multiplication,
-        "x": Multiplication,
-        # Division
-        "Division": Division,
-        "division": Division,
-        "Divide": Division,
-        "divide": Division,
-        "/": Division,
-        # Power
-        "Power": Power,
-        "power": Power,
-        "^": Power,
-        "**": Power,
-        # Root
-        "Root": Root,
-        "root": Root,
-        # Modulus
-        "Modulus": Modulus,
-        "modulus": Modulus,
-        "Modulo": Modulus,
-        "modulo": Modulus,
-        "%": Modulus,
-        # Percent
-        "Percent": Percent,
-        "percent": Percent,
-        # Absolute Difference
-        "Absolute Difference": AbsoluteDifference,
-        "AbsoluteDifference": AbsoluteDifference,
-        "absolute difference": AbsoluteDifference,
-        "absolutedifference": AbsoluteDifference,
-        "absdiff": AbsoluteDifference,
-    }
+    _operations: Dict[str, type[Operation]] = {}
+
+    @classmethod
+    def register(cls, operation_class: type[Operation], *aliases: str) -> None:
+        for alias in (operation_class.__name__, *aliases):
+            cls._operations[alias.strip().lower()] = operation_class
 
     @classmethod
     def create(cls, name: str) -> Operation:
-        normalized_name = str(name).strip()
-        operation_class = cls._operations.get(normalized_name)
+        key = str(name).strip().lower()
+        operation_class = cls._operations.get(key)
         if operation_class is None:
-            operation_class = cls._operations.get(normalized_name.lower())
-        if operation_class is None:
-            title_case_name = normalized_name.title()
-            operation_class = cls._operations.get(title_case_name)
-        if operation_class is None:
-            raise ValidationError("Unsupported operation")
+            raise ValidationError(f"Unsupported operation: {name}")
         return operation_class()
 
     @classmethod
@@ -180,4 +130,12 @@ class OperationFactory:
         return dict(cls._operations)
 
 
-operations = OperationFactory._operations
+OperationFactory.register(Addition, "add", "+")
+OperationFactory.register(Subtraction, "subtract", "-")
+OperationFactory.register(Multiplication, "multiply", "*", "x")
+OperationFactory.register(Division, "divide", "/")
+OperationFactory.register(Power, "^", "**")
+OperationFactory.register(Root)
+OperationFactory.register(Modulus, "modulo", "%")
+OperationFactory.register(Percent)
+OperationFactory.register(AbsoluteDifference, "absolute difference", "absdiff")
